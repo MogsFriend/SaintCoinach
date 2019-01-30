@@ -117,6 +117,9 @@ namespace Godbert.ViewModels {
             _Progress = null;
         }
         private void _Export(Territory territory, Ookii.Dialogs.Wpf.ProgressDialog progress) {
+            var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
+            customCulture.NumberFormat.NumberDecimalSeparator = ".";
+            System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 
             string teriName = territory.Name;
 
@@ -223,13 +226,19 @@ namespace Godbert.ViewModels {
                     vertStr.Add($"g {modelFilePath}_{i.ToString()}_{k.ToString()}");
                     vertStr.Add($"usemtl {materialName}");
                     for (UInt64 j = 0; j + 3 < (UInt64)mesh.Indices.Length + 1; j += 3) {
-                        vertStr.Add(
-                            $"f " +
-                            $"{mesh.Indices[j] + vs}/{mesh.Indices[j] + vt}/{mesh.Indices[j] + vn} " +
-                            $"{mesh.Indices[j + 1] + vs}/{mesh.Indices[j + 1] + vt}/{mesh.Indices[j + 1] + vn} " +
-                            $"{mesh.Indices[j + 2] + vs}/{mesh.Indices[j + 2] + vt}/{mesh.Indices[j + 2] + vn}");
+                        vertStr.Add("f " +
+                            (mesh.Indices[j] + vs) + '/' + (mesh.Indices[j] + vt) + '/' + (mesh.Indices[j] + vn) + ' ' +
+                            (mesh.Indices[j + 1] + vs) + '/' + (mesh.Indices[j + 1] + vt) + '/' + (mesh.Indices[j + 1] + vn) + ' ' +
+                            (mesh.Indices[j + 2] + vs) + '/' + (mesh.Indices[j + 2] + vt) + '/' + (mesh.Indices[j + 2] + vn)
+                            );
+                        // because o12 DNA is big
+                        if (j % 500 == 0) {
+                            System.IO.File.AppendAllLines(_ExportFileName, vertStr);
+                            vertStr.Clear();
+                        }
                     }
-                    if (i % 1000 == 0) {
+
+                    if (i % 500 == 0) {
                         System.IO.File.AppendAllLines(_ExportFileName, vertStr);
                         vertStr.Clear();
                     }
@@ -456,6 +465,7 @@ namespace Godbert.ViewModels {
                 System.Diagnostics.Debug.WriteLine(e.StackTrace);
                 System.Windows.Forms.MessageBox.Show(e.StackTrace, $"Unable to export {teriName}");
             }
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.DefaultThreadCurrentCulture;
         }
         #endregion
 
