@@ -6,8 +6,10 @@ using SaintCoinach.Graphics;
 using SaintCoinach.Graphics.Viewer;
 using SaintCoinach;
 using SaintCoinach.Xiv;
-using Assimp;
-using Assimp.Configs;
+using Aspose;
+using Aspose.ThreeD;
+using Aspose.ThreeD.Utilities;
+using Aspose.ThreeD.Shading;
 
 namespace Godbert.ViewModels {
     using Commands;
@@ -119,25 +121,18 @@ namespace Godbert.ViewModels {
         }
         private void _Export(Territory territory, Ookii.Dialogs.Wpf.ProgressDialog progress) {
 
-            var scene = new Assimp.Scene();
-            scene.RootNode = new Assimp.Node(territory.Name + "_terrain");
-            var lgbNode = new Node("terrain");
+            Scene aspScene = new Scene();
+            Node aspRoot = aspScene.RootNode.CreateChildNode(territory.Name);
+            Node aspLgb = aspRoot.CreateChildNode("terrain");
+            Node aspModel = new Node();
 
-            var sgbNode = new Assimp.Node();
-            var modelNode = new Assimp.Node();
+            Node aspSgb;
 
-            var aMesh = new Assimp.Mesh();
-            var aMat = new Assimp.Material();
+            PhongMaterial aspMat = new Aspose.ThreeD.Shading.PhongMaterial();
+            Aspose.ThreeD.Entities.Mesh aspMesh = new Aspose.ThreeD.Entities.Mesh();
 
-            var exporter = new AssimpContext();
+            var fformat = FileFormat.FBX7400ASCII;
 
-            var exportFormat = "dae";
-            var exportId = "";
-            foreach (var format in exporter.GetSupportedExportFormats()) {
-                if (format.FileExtension.Contains(exportFormat)) {
-                    exportId = format.FormatId;
-                }
-            }
 
             var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
@@ -167,57 +162,62 @@ namespace Godbert.ViewModels {
                 int lights = 0;
                 List<string> lightStrs = new List<string>() { "import bpy" };
                 List<string> vertStr = new List<string>();
-                Dictionary<string, int> exportedMats = new Dictionary<string, int>();
-                UInt64 vs = 1, vt = 1, vn = 1, i = 0;
+                Dictionary<string, Aspose.ThreeD.Shading.PhongMaterial> exportedMats = new Dictionary<string, Aspose.ThreeD.Shading.PhongMaterial>();
+                UInt64 vs = 0, vt = 0, vn = 0, i = 0;
                 Matrix IdentityMatrix = Matrix.Identity;
 
                 void ExportMaterials(Material m, string path) {
-                    int found = 0;
+                    
+                    Aspose.ThreeD.Shading.PhongMaterial found = null;
                     if (exportedMats.TryGetValue(path, out found)) {
-                        aMesh.MaterialIndex = found - 1;
+                        aspModel.Materials.Add(found);
                         return;
                     }
-                    exportedMats.Add(path, scene.MaterialCount);
 
-                    aMat = new Assimp.Material();
-                    aMat.Name = path;
-                    
+                    aspMat = new Aspose.ThreeD.Shading.PhongMaterial(path);
+
+                    bool imgFound = false;
                     foreach (var img in m.TexturesFiles) {
-
+                        
                         var mtlName = img.Path.Replace('/', '_');
-                        if (exportedMats.TryGetValue(path + mtlName, out found)) {
-                            aMesh.MaterialIndex = found;
-                            continue;
-                        }
-                        SaintCoinach.Imaging.ImageConverter.Convert(img).Save($"{_ExportDirectory}/{mtlName}.png");
 
+                        SaintCoinach.Imaging.ImageConverter.Convert(img).Save($"{_ExportDirectory}/{mtlName}.png");
+                        
                         var pngFile = mtlName + ".png";
 
                         if (mtlName.Contains("_dummy_"))
                             continue;
-                        
-                        var tex = new Assimp.EmbeddedTexture("png", System.IO.File.ReadAllBytes($"{_ExportDirectory}/{mtlName}.png"));
-                        scene.Textures.Add(tex);
-                        
+
+                        Aspose.ThreeD.Shading.Texture tex = new Aspose.ThreeD.Shading.Texture(pngFile);
+                        tex.FileName = pngFile;
+                        tex.Content = System.IO.File.ReadAllBytes($"{_ExportDirectory}/{mtlName}.png");
+
                         if (mtlName.Contains("_n.tex")) {
-                            aMat.TextureNormal = new TextureSlot(pngFile, TextureType.Normals, 0, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
+                            imgFound = true;
+                            aspMat.SetTexture(Aspose.ThreeD.Shading.Material.MapNormal, tex);
+
                         }
                         else if (mtlName.Contains("_s.tex")) {
-                            aMat.TextureSpecular = new TextureSlot(pngFile, TextureType.Specular, 1, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
+                            imgFound = true;
+
+                            aspMat.SetTexture(Aspose.ThreeD.Shading.Material.MapSpecular, tex);
                         }
                         else if (!mtlName.Contains("_a.tex")) {
-                            aMat.TextureDiffuse = new TextureSlot(pngFile, TextureType.Diffuse, 2, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
+                            imgFound = true;
+
+                            aspMat.SetTexture(Aspose.ThreeD.Shading.Material.MapDiffuse, tex);
                         }
                         else {
-                            System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"map_Ka {mtlName}.png\n");
-                            aMat.TextureAmbient = new TextureSlot(mtlName + ".png", TextureType.Ambient, 3, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
+                            imgFound = true;
+                            aspMat.SetTexture(Aspose.ThreeD.Shading.Material.MapAmbient, tex);
                         }
 
                     }
 
+                    if (!imgFound)
+                        return;
 
-                    aMesh.MaterialIndex = scene.MaterialCount;
-                    scene.Materials.Add(aMat);
+                    aspModel.Materials.Add(aspMat);
                 }
 
                 Matrix CreateMatrix(SaintCoinach.Graphics.Vector3 translation, SaintCoinach.Graphics.Vector3 rotation, SaintCoinach.Graphics.Vector3 scale) {
@@ -234,8 +234,11 @@ namespace Godbert.ViewModels {
                     if (progress.CancellationPending)
                         throw new ExportCancelException("User canceled export");
 
-                    aMesh = new Assimp.Mesh($"{materialName}_{i}");
-                    aMesh.SetIndices(mesh.Indices.Select<ushort, int>(f => f).ToArray(), 3);
+                    aspMesh = new Aspose.ThreeD.Entities.Mesh($"{modelFilePath}_{i}");
+
+                    var tempVs = 0;
+
+                    aspMesh.CreatePolygon(mesh.Indices.Select<ushort, int>(f => f).ToArray());
 
                     foreach (var v in mesh.Vertices) {
 
@@ -251,30 +254,45 @@ namespace Godbert.ViewModels {
                         y = t.TranslationVector.Y;
                         z = t.TranslationVector.Z;
 
-                        aMesh.Vertices.Add(new Vector3D(x, y, z));
-                        
+                        tempVs++;
+                        aspMesh.ControlPoints.Add(new Aspose.ThreeD.Utilities.Vector4(x, y, z, w));
+
                         if (v.Color != null) {
-                            aMesh.VertexColorChannels[0].Add(
-                                new Color4D(v.Color.Value.X, v.Color.Value.Y, v.Color.Value.Z, v.Color.Value.Z)
-                            );
+                            var aspCol = new Aspose.ThreeD.Entities.VertexElementVertexColor();
+                            aspCol.Data.Add(new Aspose.ThreeD.Utilities.Vector4(v.Color.Value.X, v.Color.Value.Y, v.Color.Value.Z, v.Color.Value.W));
+                            aspMesh.VertexElements.Add(aspCol);
+                            //aspCol.SetIndices(mesh.Indices.Select<ushort, int>(f => f).ToArray());
                         }
                         if (v.Normal != null) {
-                            aMesh.Normals.Add(new Vector3D(v.Normal.Value.X, v.Normal.Value.Y, v.Normal.Value.Z));
+                            var aspNormal = new Aspose.ThreeD.Entities.VertexElementNormal();
+                            aspNormal.Data.Add(new Aspose.ThreeD.Utilities.Vector4(v.Normal.Value.X, v.Normal.Value.Y, v.Normal.Value.Z, 0));
+                            aspMesh.VertexElements.Add(aspNormal);
+                            //aspNormal.SetIndices(mesh.Indices.Select<ushort, int>(f => f).ToArray());
+
                         }
                         if (v.UV != null) {
-                            aMesh.TextureCoordinateChannels[0].Add(new Vector3D(v.UV.Value.X, v.UV.Value.Y, v.UV.Value.Z));
+                            var aspUV = new Aspose.ThreeD.Entities.VertexElementUV();
+                            aspUV.Data.Add(new Aspose.ThreeD.Utilities.Vector4(v.UV.Value.X, v.UV.Value.Y, v.UV.Value.Z, v.UV.Value.W));
+                            aspMesh.VertexElements.Add(aspUV);
+                            //aspUV.SetIndices(mesh.Indices.Select<ushort, int>(f => f).ToArray());
+
                         }
                         if (v.Tangent1 != null) {
-                            //aMesh.Tangents.Add(new Vector3D(v.Tangent1.Value.X, v.Tangent1.Value.Y, v.Tangent1.Value.Z));
+                            //var aspTangent = new Aspose.ThreeD.Entities.VertexElementTangent();
+                            //aspTangent.Data.Add(new Aspose.ThreeD.Utilities.Vector4(v.Tangent1.Value.X, v.Tangent1.Value.Y, v.Tangent1.Value.Z, v.Tangent1.Value.W));
+                            //aspMesh.VertexElements.Add(aspTangent);
                         }
                         if (v.Tangent2 != null) {
-                            //aMesh.Tangents.Add(new Vector3D(v.Tangent2.Value.X, v.Tangent2.Value.Y, v.Tangent2.Value.Z));
+                            //var aspTangent = new Aspose.ThreeD.Entities.VertexElementTangent();
+                            //aspTangent.Data.Add(new Aspose.ThreeD.Utilities.Vector4(v.Tangent2.Value.X, v.Tangent2.Value.Y, v.Tangent2.Value.Z, v.Tangent2.Value.W));
+                            //aspMesh.VertexElements.Add(aspTangent);
                         }
-                    }
-                    
 
-                    modelNode.MeshIndices.Add(scene.MeshCount);
-                    scene.Meshes.Add(aMesh);
+                    }
+                    if (tempVs > 0) {
+                        Aspose.ThreeD.Entities.PolygonModifier.Triangulate(aspMesh);
+                        aspModel.AddEntity(aspMesh);
+                    }
                 }
 
                 Dictionary<string, bool> exportedSgbFiles = new Dictionary<string, bool>();
@@ -295,12 +313,11 @@ namespace Godbert.ViewModels {
                                 continue;
                             }
                             if (newGroup) {
-                                sgbNode = new Node(sgbGroup.Name, lgbNode);
                                 //vertStr.Add($"o {sgbFile.File.Path}_{sgbGroup.Name}_{i}");
                                 newGroup = false;
                             }
                             var modelName = filePath.Substring(filePath.LastIndexOf("/") + 1) + "_" + i++;
-                            modelNode = new Node(modelName, sgbNode);
+                            aspModel = aspSgb.CreateChildNode(modelName);
                             
                             for (var j = 0; j < hq.Meshes.Length; ++j) {
                                 var mesh = hq.Meshes[j];
@@ -310,9 +327,6 @@ namespace Godbert.ViewModels {
                                 ExportMaterials(mtl, path);
                                 ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref rootGimTransform, ref currGimTransform, ref modelTransform);
                             }
-
-                            // add child node
-                            sgbNode.Children.Add(modelNode);
                         }
 
                         foreach (var light in sgbGroup.Entries.OfType<SaintCoinach.Graphics.Sgb.SgbLightEntry>()) {
@@ -333,10 +347,6 @@ namespace Godbert.ViewModels {
                             lightStrs.Add($"#unk4 {light.Header.Entry4.X} {light.Header.Entry4.Y}");
                             lightStrs.Add("");
                         }
-
-                        // add child node
-                        lgbNode.Children.Add(sgbNode);
-                        sgbNode = new Node();
                     }
                 }
 
@@ -351,7 +361,7 @@ namespace Godbert.ViewModels {
 
                         progress.ReportProgress(0, currentTitle, part.Model.File.Path);
 
-                        modelNode = new Node(teriName + "_tr" + teriPart++);
+                        aspModel = aspLgb.CreateChildNode(teriName + "_tr" + teriPart++);
                         for (var j = 0; j < hq.Meshes.Length; ++j) {
                             var mesh = hq.Meshes[j];
                             var mtl = mesh.Material.Get();
@@ -360,15 +370,11 @@ namespace Godbert.ViewModels {
                             ExportMaterials(mtl, path);
                             ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref IdentityMatrix, ref IdentityMatrix, ref IdentityMatrix);
                         }
-                        scene.RootNode.Children.Add(modelNode);
                     }
                 }
 
-                //exporter.ExportFile(scene, $"{_ExportDirectory}{scene.RootNode.Name}." + exportFormat, exportId);
+                //aspScene.Save($"{_ExportDirectory}{teriName}" + fformat.Extension, fformat);
 
-                //System.IO.File.AppendAllLines(_ExportFileName, vertStr);
-                //vertStr.Clear();
-                //vs = 1; vn = 1; vt = 1; i = 0;
                 foreach (var lgb in territory.LgbFiles) {
                     foreach (var lgbGroup in lgb.Groups) {
 
@@ -383,13 +389,8 @@ namespace Godbert.ViewModels {
 
                                 newGroup = false;
 
-                                scene.RootNode.Children.Add(lgbNode);
-                                lgbNode = new Node(lgbGroup.Name, scene.RootNode);
-
-                                sgbNode = new Node();
-                                modelNode = new Node();
-                                aMat = new Assimp.Material();
-                                aMesh = new Assimp.Mesh();
+                                // new node
+                                aspLgb = aspScene.RootNode.CreateChildNode(lgbGroup.Name);
                                 //exportedMats.Clear();
 
                                 lightsFileName = $"./{_ExportDirectory}/{teriName}-{lgbGroup.Name}-lights.txt";
@@ -412,7 +413,8 @@ namespace Godbert.ViewModels {
                                     var lgbTransform = CreateMatrix(asMdl.Header.Translation, asMdl.Header.Rotation, asMdl.Header.Scale);
                                     var filePath = asMdl.ModelFilePath;
 
-                                    modelNode = new Node(filePath.Substring(filePath.LastIndexOf("/") + 1) + "_" + i++, lgbNode);
+                                    // new node
+                                    aspModel = aspLgb.CreateChildNode(filePath.Substring(filePath.LastIndexOf("/") + 1) + "_" + i++);
 
                                     for (var j = 0; j < hq.Meshes.Length; ++j) {
                                         var mesh = hq.Meshes[j];
@@ -423,15 +425,14 @@ namespace Godbert.ViewModels {
                                         ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref IdentityMatrix, ref IdentityMatrix, ref IdentityMatrix);
                                     }
 
-                                    // add child
-                                    lgbNode.Children.Add(modelNode);
                                     break;
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Gimmick:
                                     var asGim = part as SaintCoinach.Graphics.Lgb.LgbGimmickEntry;
                                     if (asGim.Gimmick == null)
                                         continue;
 
-                                    sgbNode = new Node(asGim.Name);
+                                    // new node
+                                    aspSgb = aspLgb.CreateChildNode(asGim.Gimmick.File.Path);
 
                                     progress.ReportProgress(0, currentTitle = $"Exporting Gimmick {asGim.Name} {asGim.Header.GimmickId}", "");
                                     
@@ -452,11 +453,16 @@ namespace Godbert.ViewModels {
                                             }
                                         }
                                     }
+
                                     break;
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.EventObject:
                                     var asEobj = part as SaintCoinach.Graphics.Lgb.LgbEventObjectEntry;
                                     if (asEobj.Gimmick == null)
                                         continue;
+
+                                    // new node
+                                    aspSgb = aspLgb.CreateChildNode(asEobj.Gimmick.File.Path);
+
 
                                     progress.ReportProgress(0, currentTitle = $"Exporting EObj {asEobj.Name} {asEobj.Header.EventObjectId} {asEobj.Header.GimmickId}", "");
 
@@ -488,6 +494,7 @@ namespace Godbert.ViewModels {
                                             }
                                         }
                                     }
+
                                     break;
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Light:
                                     var asLight = part as SaintCoinach.Graphics.Lgb.LgbLightEntry;
@@ -509,14 +516,15 @@ namespace Godbert.ViewModels {
                     }
                 }
 
-                exporter.ExportFile(scene, $"{_ExportDirectory}{scene.RootNode.Name}." + exportFormat, exportId, PostProcessSteps.None);
+                aspScene.Save($"{_ExportDirectory}{teriName}" + fformat.Extension, fformat);
+                //exporter.ExportFile(scene, $"{_ExportDirectory}{scene.RootNode.Name}." + exportFormat, exportId, PostProcessSteps.None);
 
 
                 //System.IO.File.AppendAllLines(_ExportFileName, vertStr);
                 //vertStr.Clear();
                 //System.IO.File.AppendAllLines(lightsFileName, lightStrs);
                 //lightStrs.Clear();
-                System.Windows.Forms.MessageBox.Show("Finished exporting " + territory.Name, "", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+                System.Windows.Forms.MessageBox.Show("Finished exporting " + territory.Name + fformat.Extension, "", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
             }
             catch (ExportCancelException e) {
                 System.Windows.Forms.MessageBox.Show(e.Message, $"Canceled {teriName} export");
