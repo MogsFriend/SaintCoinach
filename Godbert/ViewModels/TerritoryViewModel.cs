@@ -6,6 +6,8 @@ using SaintCoinach.Graphics;
 using SaintCoinach.Graphics.Viewer;
 using SaintCoinach;
 using SaintCoinach.Xiv;
+using Assimp;
+using Assimp.Configs;
 
 namespace Godbert.ViewModels {
     using Commands;
@@ -93,7 +95,7 @@ namespace Godbert.ViewModels {
         }
 
         private void OnExport() {
-            
+
             if (SelectedTerritory == null)
                 return;
             try {
@@ -116,6 +118,27 @@ namespace Godbert.ViewModels {
             _Progress = null;
         }
         private void _Export(Territory territory, Ookii.Dialogs.Wpf.ProgressDialog progress) {
+
+            var scene = new Assimp.Scene();
+            scene.RootNode = new Assimp.Node(territory.Name + "_terrain");
+            var lgbNode = new Node("terrain");
+
+            var sgbNode = new Assimp.Node();
+            var modelNode = new Assimp.Node();
+
+            var aMesh = new Assimp.Mesh();
+            var aMat = new Assimp.Material();
+
+            var exporter = new AssimpContext();
+
+            var exportFormat = "dae";
+            var exportId = "";
+            foreach (var format in exporter.GetSupportedExportFormats()) {
+                if (format.FileExtension.Contains(exportFormat)) {
+                    exportId = format.FormatId;
+                }
+            }
+
             var customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
             customCulture.NumberFormat.NumberDecimalSeparator = ".";
             System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
@@ -130,10 +153,11 @@ namespace Godbert.ViewModels {
                     System.IO.Directory.CreateDirectory(Environment.CurrentDirectory + $"{_ExportDirectory}");
                 }
 
-                var teriFileName = $"./{_ExportDirectory}/{territory.Name}.obj";
-                var fileName = teriFileName;
+                //var teriFileName = $"./{_ExportDirectory}/{territory.Name}.obj";
                 var lightsFileName = $"./{_ExportDirectory}/{territory.Name}-lights.txt";
-                var _ExportFileName = fileName;
+                var fileName = lightsFileName;
+
+                var _ExportFileName = lightsFileName;
                 {
                     var f = System.IO.File.Create(fileName);
                     f.Close();
@@ -143,43 +167,57 @@ namespace Godbert.ViewModels {
                 int lights = 0;
                 List<string> lightStrs = new List<string>() { "import bpy" };
                 List<string> vertStr = new List<string>();
-                Dictionary<string, bool> exportedPaths = new Dictionary<string, bool>();
+                Dictionary<string, int> exportedMats = new Dictionary<string, int>();
                 UInt64 vs = 1, vt = 1, vn = 1, i = 0;
                 Matrix IdentityMatrix = Matrix.Identity;
 
                 void ExportMaterials(Material m, string path) {
-                    vertStr.Add($"mtllib {path}.mtl");
-                    bool found = false;
-                    if (exportedPaths.TryGetValue(path, out found)) {
+                    int found = 0;
+                    if (exportedMats.TryGetValue(path, out found)) {
+                        aMesh.MaterialIndex = found - 1;
                         return;
                     }
-                    exportedPaths.Add(path, true);
-                    System.IO.File.Delete($"{_ExportDirectory}/{path}.mtl");
-                    System.IO.File.AppendAllText($"{_ExportDirectory}/{path}.mtl", $"newmtl {path}\n");
+                    exportedMats.Add(path, scene.MaterialCount);
+
+                    aMat = new Assimp.Material();
+                    aMat.Name = path;
+                    
                     foreach (var img in m.TexturesFiles) {
+
                         var mtlName = img.Path.Replace('/', '_');
-                        if (exportedPaths.TryGetValue(path + mtlName, out found)) {
+                        if (exportedMats.TryGetValue(path + mtlName, out found)) {
+                            aMesh.MaterialIndex = found;
                             continue;
                         }
-
                         SaintCoinach.Imaging.ImageConverter.Convert(img).Save($"{_ExportDirectory}/{mtlName}.png");
+
+                        var pngFile = mtlName + ".png";
+
                         if (mtlName.Contains("_dummy_"))
                             continue;
+                        
+                        var tex = new Assimp.EmbeddedTexture("png", System.IO.File.ReadAllBytes($"{_ExportDirectory}/{mtlName}.png"));
+                        scene.Textures.Add(tex);
+                        
                         if (mtlName.Contains("_n.tex")) {
-                            System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"bump {mtlName}.png\n");
+                            aMat.TextureNormal = new TextureSlot(pngFile, TextureType.Normals, 0, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
                         }
                         else if (mtlName.Contains("_s.tex")) {
-                            System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"map_Ks {mtlName}.png\n");
+                            aMat.TextureSpecular = new TextureSlot(pngFile, TextureType.Specular, 1, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
                         }
                         else if (!mtlName.Contains("_a.tex")) {
-                            System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"map_Kd {mtlName}.png\n");
+                            aMat.TextureDiffuse = new TextureSlot(pngFile, TextureType.Diffuse, 2, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
                         }
                         else {
                             System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"map_Ka {mtlName}.png\n");
+                            aMat.TextureAmbient = new TextureSlot(mtlName + ".png", TextureType.Ambient, 3, TextureMapping.FromUV, 0, 0.0f, TextureOperation.Add, TextureWrapMode.Clamp, TextureWrapMode.Clamp, 0);
                         }
 
-                        exportedPaths.Add(path + mtlName, true);
                     }
+
+
+                    aMesh.MaterialIndex = scene.MaterialCount;
+                    scene.Materials.Add(aMat);
                 }
 
                 Matrix CreateMatrix(SaintCoinach.Graphics.Vector3 translation, SaintCoinach.Graphics.Vector3 rotation, SaintCoinach.Graphics.Vector3 scale) {
@@ -195,8 +233,10 @@ namespace Godbert.ViewModels {
                     i++;
                     if (progress.CancellationPending)
                         throw new ExportCancelException("User canceled export");
-                    var k = 0;
-                    UInt64 tempVs = 0, tempVn = 0, tempVt = 0;
+
+                    aMesh = new Assimp.Mesh($"{materialName}_{i}");
+                    aMesh.SetIndices(mesh.Indices.Select<ushort, int>(f => f).ToArray(), 3);
+
                     foreach (var v in mesh.Vertices) {
 
                         var x = v.Position.Value.X;
@@ -211,39 +251,30 @@ namespace Godbert.ViewModels {
                         y = t.TranslationVector.Y;
                         z = t.TranslationVector.Z;
 
-                        vertStr.Add($"v {x} {y} {z} {v.Position.Value.W}");
-                        tempVs++;
-
-                        vertStr.Add($"vn {v.Normal.Value.X} {v.Normal.Value.Y} {v.Normal.Value.Z}");
-                        tempVn++;
-
-                        if (v.UV != null) {
-                            vertStr.Add($"vt {v.UV.Value.X} {v.UV.Value.Y} {v.UV.Value.Z} {v.UV.Value.W}");
-                            tempVt++;
-                        }
-                    }
-                    vertStr.Add($"g {modelFilePath}_{i.ToString()}_{k.ToString()}");
-                    vertStr.Add($"usemtl {materialName}");
-                    for (UInt64 j = 0; j + 3 < (UInt64)mesh.Indices.Length + 1; j += 3) {
-                        vertStr.Add("f " +
-                            (mesh.Indices[j] + vs) + '/' + (mesh.Indices[j] + vt) + '/' + (mesh.Indices[j] + vn) + ' ' +
-                            (mesh.Indices[j + 1] + vs) + '/' + (mesh.Indices[j + 1] + vt) + '/' + (mesh.Indices[j + 1] + vn) + ' ' +
-                            (mesh.Indices[j + 2] + vs) + '/' + (mesh.Indices[j + 2] + vt) + '/' + (mesh.Indices[j + 2] + vn)
+                        aMesh.Vertices.Add(new Vector3D(x, y, z));
+                        
+                        if (v.Color != null) {
+                            aMesh.VertexColorChannels[0].Add(
+                                new Color4D(v.Color.Value.X, v.Color.Value.Y, v.Color.Value.Z, v.Color.Value.Z)
                             );
-                        // because o12 DNA is big
-                        if (j % 500 == 0) {
-                            System.IO.File.AppendAllLines(_ExportFileName, vertStr);
-                            vertStr.Clear();
+                        }
+                        if (v.Normal != null) {
+                            aMesh.Normals.Add(new Vector3D(v.Normal.Value.X, v.Normal.Value.Y, v.Normal.Value.Z));
+                        }
+                        if (v.UV != null) {
+                            aMesh.TextureCoordinateChannels[0].Add(new Vector3D(v.UV.Value.X, v.UV.Value.Y, v.UV.Value.Z));
+                        }
+                        if (v.Tangent1 != null) {
+                            //aMesh.Tangents.Add(new Vector3D(v.Tangent1.Value.X, v.Tangent1.Value.Y, v.Tangent1.Value.Z));
+                        }
+                        if (v.Tangent2 != null) {
+                            //aMesh.Tangents.Add(new Vector3D(v.Tangent2.Value.X, v.Tangent2.Value.Y, v.Tangent2.Value.Z));
                         }
                     }
+                    
 
-                    if (i % 500 == 0) {
-                        System.IO.File.AppendAllLines(_ExportFileName, vertStr);
-                        vertStr.Clear();
-                    }
-                    vs += tempVs;
-                    vn += tempVn;
-                    vt += tempVt;
+                    modelNode.MeshIndices.Add(scene.MeshCount);
+                    scene.Meshes.Add(aMesh);
                 }
 
                 Dictionary<string, bool> exportedSgbFiles = new Dictionary<string, bool>();
@@ -264,9 +295,13 @@ namespace Godbert.ViewModels {
                                 continue;
                             }
                             if (newGroup) {
-                                vertStr.Add($"o {sgbFile.File.Path}_{sgbGroup.Name}_{i}");
+                                sgbNode = new Node(sgbGroup.Name, lgbNode);
+                                //vertStr.Add($"o {sgbFile.File.Path}_{sgbGroup.Name}_{i}");
                                 newGroup = false;
                             }
+                            var modelName = filePath.Substring(filePath.LastIndexOf("/") + 1) + "_" + i++;
+                            modelNode = new Node(modelName, sgbNode);
+                            
                             for (var j = 0; j < hq.Meshes.Length; ++j) {
                                 var mesh = hq.Meshes[j];
                                 var mtl = mesh.Material.Get();
@@ -275,6 +310,9 @@ namespace Godbert.ViewModels {
                                 ExportMaterials(mtl, path);
                                 ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref rootGimTransform, ref currGimTransform, ref modelTransform);
                             }
+
+                            // add child node
+                            sgbNode.Children.Add(modelNode);
                         }
 
                         foreach (var light in sgbGroup.Entries.OfType<SaintCoinach.Graphics.Sgb.SgbLightEntry>()) {
@@ -295,11 +333,17 @@ namespace Godbert.ViewModels {
                             lightStrs.Add($"#unk4 {light.Header.Entry4.X} {light.Header.Entry4.Y}");
                             lightStrs.Add("");
                         }
+
+                        // add child node
+                        lgbNode.Children.Add(sgbNode);
+                        sgbNode = new Node();
                     }
                 }
 
                 progress.ReportProgress(0, currentTitle = "Terrain", "");
                 if (territory.Terrain != null) {
+
+                    var teriPart = 0;
                     foreach (var part in territory.Terrain.Parts) {
                         var hq = part.Model.GetModel(ModelQuality.High);
                         var filePath = hq.Definition.File.Path;
@@ -307,6 +351,7 @@ namespace Godbert.ViewModels {
 
                         progress.ReportProgress(0, currentTitle, part.Model.File.Path);
 
+                        modelNode = new Node(teriName + "_tr" + teriPart++);
                         for (var j = 0; j < hq.Meshes.Length; ++j) {
                             var mesh = hq.Meshes[j];
                             var mtl = mesh.Material.Get();
@@ -315,12 +360,15 @@ namespace Godbert.ViewModels {
                             ExportMaterials(mtl, path);
                             ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref IdentityMatrix, ref IdentityMatrix, ref IdentityMatrix);
                         }
+                        scene.RootNode.Children.Add(modelNode);
                     }
                 }
 
-                System.IO.File.AppendAllLines(_ExportFileName, vertStr);
-                vertStr.Clear();
-                vs = 1; vn = 1; vt = 1; i = 0;
+                //exporter.ExportFile(scene, $"{_ExportDirectory}{scene.RootNode.Name}." + exportFormat, exportId);
+
+                //System.IO.File.AppendAllLines(_ExportFileName, vertStr);
+                //vertStr.Clear();
+                //vs = 1; vn = 1; vt = 1; i = 0;
                 foreach (var lgb in territory.LgbFiles) {
                     foreach (var lgbGroup in lgb.Groups) {
 
@@ -335,13 +383,15 @@ namespace Godbert.ViewModels {
 
                                 newGroup = false;
 
-                                System.IO.File.AppendAllLines(_ExportFileName, vertStr);
-                                vertStr.Clear();
+                                scene.RootNode.Children.Add(lgbNode);
+                                lgbNode = new Node(lgbGroup.Name, scene.RootNode);
 
-                                //vertStr.Add($"o {lgbGroup.Name}");
+                                sgbNode = new Node();
+                                modelNode = new Node();
+                                aMat = new Assimp.Material();
+                                aMesh = new Assimp.Mesh();
+                                //exportedMats.Clear();
 
-                                vs = 1; vn = 1; vt = 1; i = 0;
-                                _ExportFileName = $"./{_ExportDirectory}/{teriName}-{lgbGroup.Name}.obj";
                                 lightsFileName = $"./{_ExportDirectory}/{teriName}-{lgbGroup.Name}-lights.txt";
 
                                 var f = System.IO.File.Create(_ExportFileName);
@@ -362,6 +412,8 @@ namespace Godbert.ViewModels {
                                     var lgbTransform = CreateMatrix(asMdl.Header.Translation, asMdl.Header.Rotation, asMdl.Header.Scale);
                                     var filePath = asMdl.ModelFilePath;
 
+                                    modelNode = new Node(filePath.Substring(filePath.LastIndexOf("/") + 1) + "_" + i++, lgbNode);
+
                                     for (var j = 0; j < hq.Meshes.Length; ++j) {
                                         var mesh = hq.Meshes[j];
                                         var mtl = mesh.Material.Get();
@@ -370,12 +422,17 @@ namespace Godbert.ViewModels {
                                         ExportMaterials(mtl, path);
                                         ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref IdentityMatrix, ref IdentityMatrix, ref IdentityMatrix);
                                     }
+
+                                    // add child
+                                    lgbNode.Children.Add(modelNode);
                                     break;
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Gimmick:
                                     var asGim = part as SaintCoinach.Graphics.Lgb.LgbGimmickEntry;
                                     if (asGim.Gimmick == null)
                                         continue;
-                                               
+
+                                    sgbNode = new Node(asGim.Name);
+
                                     progress.ReportProgress(0, currentTitle = $"Exporting Gimmick {asGim.Name} {asGim.Header.GimmickId}", "");
                                     
                                     lgbTransform = CreateMatrix(asGim.Header.Translation, asGim.Header.Rotation, asGim.Header.Scale);
@@ -451,10 +508,14 @@ namespace Godbert.ViewModels {
                         lightStrs.Clear();
                     }
                 }
-                System.IO.File.AppendAllLines(_ExportFileName, vertStr);
-                vertStr.Clear();
-                System.IO.File.AppendAllLines(lightsFileName, lightStrs);
-                lightStrs.Clear();
+
+                exporter.ExportFile(scene, $"{_ExportDirectory}{scene.RootNode.Name}." + exportFormat, exportId, PostProcessSteps.None);
+
+
+                //System.IO.File.AppendAllLines(_ExportFileName, vertStr);
+                //vertStr.Clear();
+                //System.IO.File.AppendAllLines(lightsFileName, lightStrs);
+                //lightStrs.Clear();
                 System.Windows.Forms.MessageBox.Show("Finished exporting " + territory.Name, "", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
             }
             catch (ExportCancelException e) {
