@@ -301,19 +301,33 @@ namespace Godbert.ViewModels {
                         foreach (var light in sgbGroup.Entries.OfType<SaintCoinach.Graphics.Sgb.SgbLightEntry>()) {
                             var pos = light.Header.Translation;
                             var transform = (Matrix.Translation(pos.X, pos.Y, pos.Z) * (rootGimTransform * currGimTransform) * lgbTransform).TranslationVector;
+
                             pos.X = transform.X;
                             pos.Y = transform.Y;
                             pos.Z = transform.Z;
 
-                            lightStrs.Add($"#LIGHT_{lights++}_{light.Name}_{light.Header.UnknownId}");
-                            lightStrs.Add($"#pos {pos.X} {pos.Y} {pos.Z}");
-                            lightStrs.Add($"#UNKNOWNFLAGS 0x{light.Header.UnknownFlag1:X8} 0x{light.Header.UnknownFlag2:X8} 0x{light.Header.UnknownFlag3:X8} 0x{light.Header.UnknownFlag4:X8}");
-                            lightStrs.Add($"#UNKNOWN {light.Header.Rotation.X} {light.Header.Rotation.Y} {light.Header.Rotation.Z}");
-                            lightStrs.Add($"#UNKNOWN2 {light.Header.Scale.X} {light.Header.Scale.Y} {light.Header.Scale.Z}");
-                            lightStrs.Add($"#unk {light.Header.Entry1.X} {light.Header.Entry1.Y}");
-                            lightStrs.Add($"#unk2 {light.Header.Entry2.X} {light.Header.Entry2.Y}");
-                            lightStrs.Add($"#unk3 {light.Header.Entry3.X} {light.Header.Entry3.Y}");
-                            lightStrs.Add($"#unk4 {light.Header.Entry4.X} {light.Header.Entry4.Y}");
+                            var lHdr = light.Header;
+
+                            lightStrs.Add($"SGB_LIGHT_{lights++}_{light.Name}_{light.Header.UnknownId}");
+                            lightStrs.Add($"Pos {pos.X} {pos.Y} {pos.Z}");
+                            lightStrs.Add($"Rot {light.Header.Rotation.X} {light.Header.Rotation.Y} {light.Header.Rotation.Z}");
+                            lightStrs.Add($"Scale {light.Header.Scale.X} {light.Header.Scale.Y} {light.Header.Scale.Z}");
+                            lightStrs.Add($"LightType {lHdr.LightType.ToString()}");
+                            lightStrs.Add($"Attenuation {lHdr.Attenuation}");
+                            lightStrs.Add($"RangeRate {lHdr.RangeRate}");
+                            lightStrs.Add($"PointLightType {lHdr.PointLightType.ToString()}");
+                            lightStrs.Add($"AttenuationConeCoefficient {lHdr.AttenuationConeCoefficient}");
+                            lightStrs.Add($"ConeDegree {lHdr.ConeDegree}");
+                            lightStrs.Add($"TexturePath {light.TexturePath}");
+                            lightStrs.Add($"ColorHDRI {lHdr.DiffuseColorHDRI.Red} {lHdr.DiffuseColorHDRI.Green} {lHdr.DiffuseColorHDRI.Blue} {lHdr.DiffuseColorHDRI.Alpha} {lHdr.DiffuseColorHDRI.Intensity}");
+                            lightStrs.Add($"FollowsDirectionalLight {lHdr.FollowsDirectionalLight}");
+                            lightStrs.Add($"SpecularEnabled {lHdr.SpecularEnabled}");
+                            lightStrs.Add($"BGShadowEnabled {lHdr.BGShadowEnabled}");
+                            lightStrs.Add($"CharacterShadowEnabled {lHdr.CharacterShadowEnabled}");
+                            lightStrs.Add($"ShadowClipRange {lHdr.ShadowClipRange}");
+                            lightStrs.Add($"PlaneLightRotationX {lHdr.PlaneLightRotationX}");
+                            lightStrs.Add($"PlaneLightRotationY {lHdr.PlaneLightRotationY}");
+                            lightStrs.Add($"MergeGroupID {lHdr.MergeGroupID}");
                             lightStrs.Add("");
                         }
                     }
@@ -444,15 +458,28 @@ namespace Godbert.ViewModels {
                                     break;
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Light:
                                     var asLight = part as SaintCoinach.Graphics.Lgb.LgbLightEntry;
-                                    lightStrs.Add($"#LIGHT_{lights++}_{asLight.Name}_{asLight.Header.UnknownId}");
-                                    lightStrs.Add($"#pos {asLight.Header.Translation.X} {asLight.Header.Translation.Y} {asLight.Header.Translation.Z}");
-                                    lightStrs.Add($"#UNKNOWNFLAGS 0x{asLight.Header.UnknownFlag1:X8} 0x{asLight.Header.UnknownFlag2:X8} 0x{asLight.Header.UnknownFlag3:X8} 0x{asLight.Header.UnknownFlag4:X8}");
-                                    lightStrs.Add($"#UNKNOWN {asLight.Header.Rotation.X} {asLight.Header.Rotation.Y} {asLight.Header.Rotation.Z}");
-                                    lightStrs.Add($"#UNKNOWN2 {asLight.Header.Scale.X} {asLight.Header.Scale.Y} {asLight.Header.Scale.Z}");
-                                    lightStrs.Add($"#unk {asLight.Header.Entry1.X} {asLight.Header.Entry1.Y}");
-                                    lightStrs.Add($"#unk2 {asLight.Header.Entry2.X} {asLight.Header.Entry2.Y}");
-                                    lightStrs.Add($"#unk3 {asLight.Header.Entry3.X} {asLight.Header.Entry3.Y}");
-                                    lightStrs.Add($"#unk4 {asLight.Header.Entry4.X} {asLight.Header.Entry4.Y}");
+                                    var lHdr = asLight.Header;
+                                    lightStrs.Add($"LGB_LIGHT_{lights++}_{asLight.Name}_{asLight.Header.UnknownId}");
+                                    lightStrs.Add($"Pos {asLight.Header.Translation.X} {asLight.Header.Translation.Y} {asLight.Header.Translation.Z}");
+                                    lightStrs.Add($"Rot {asLight.Header.Rotation.X} {asLight.Header.Rotation.Y} {asLight.Header.Rotation.Z}");
+                                    lightStrs.Add($"Scale {asLight.Header.Scale.X} {asLight.Header.Scale.Y} {asLight.Header.Scale.Z}");
+                                    lightStrs.Add($"LightType {lHdr.LightType.ToString()}");
+                                    lightStrs.Add($"Attenuation {lHdr.Attenuation}");
+                                    lightStrs.Add($"RangeRate {lHdr.RangeRate}");
+                                    lightStrs.Add($"PointLightType {lHdr.PointLightType.ToString()}");
+                                    lightStrs.Add($"AttenuationConeCoefficient {lHdr.AttenuationConeCoefficient}");
+                                    lightStrs.Add($"ConeDegree {lHdr.ConeDegree}");
+                                    lightStrs.Add($"TexturePath {asLight.TexturePath}");
+                                    lightStrs.Add($"ColorHDRI {lHdr.DiffuseColorHDRI.Red} {lHdr.DiffuseColorHDRI.Green} {lHdr.DiffuseColorHDRI.Blue} {lHdr.DiffuseColorHDRI.Alpha} {lHdr.DiffuseColorHDRI.Intensity}");
+                                    lightStrs.Add($"FollowsDirectionalLight {lHdr.FollowsDirectionalLight}");
+                                    lightStrs.Add($"SpecularEnabled {lHdr.SpecularEnabled}");
+                                    lightStrs.Add($"BGShadowEnabled {lHdr.BGShadowEnabled}");
+                                    lightStrs.Add($"CharacterShadowEnabled {lHdr.CharacterShadowEnabled}");
+                                    lightStrs.Add($"ShadowClipRange {lHdr.ShadowClipRange}");
+                                    lightStrs.Add($"PlaneLightRotationX {lHdr.PlaneLightRotationX}");
+                                    lightStrs.Add($"PlaneLightRotationY {lHdr.PlaneLightRotationY}");
+                                    lightStrs.Add($"MergeGroupID {lHdr.MergeGroupID}");
+
                                     lightStrs.Add("");
                                     break;
                             }
