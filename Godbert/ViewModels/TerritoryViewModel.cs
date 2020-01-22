@@ -300,11 +300,12 @@ namespace Godbert.ViewModels {
 
                         foreach (var light in sgbGroup.Entries.OfType<SaintCoinach.Graphics.Sgb.SgbLightEntry>()) {
                             var pos = light.Header.Translation;
-                            var transform = (Matrix.Translation(pos.X, pos.Y, pos.Z) * (rootGimTransform * currGimTransform) * lgbTransform).TranslationVector;
+                            var transform = (rootGimTransform * currGimTransform) * lgbTransform;
 
-                            pos.X = transform.X;
-                            pos.Y = transform.Y;
-                            pos.Z = transform.Z;
+                            var t = Matrix.Translation(pos.X, pos.Y, pos.Z) * transform;
+                            pos.X = t.TranslationVector.X;
+                            pos.Y = t.TranslationVector.Y;
+                            pos.Z = t.TranslationVector.Z;
 
                             var lHdr = light.Header;
 
@@ -328,6 +329,40 @@ namespace Godbert.ViewModels {
                             lightStrs.Add($"PlaneLightRotationX {lHdr.PlaneLightRotationX}");
                             lightStrs.Add($"PlaneLightRotationY {lHdr.PlaneLightRotationY}");
                             lightStrs.Add($"MergeGroupID {lHdr.MergeGroupID}");
+                            lightStrs.Add("");
+                        }
+
+                        foreach (var asVfx in sgbGroup.Entries.OfType<SaintCoinach.Graphics.Sgb.SgbVfxEntry>()) {
+                            var vHdr = asVfx.Header;
+                            var pos = vHdr.Translation;
+                            var transform = (rootGimTransform * currGimTransform) * lgbTransform;
+
+                            var t = Matrix.Translation(pos.X, pos.Y, pos.Z) * transform;
+                            pos.X = t.TranslationVector.X;
+                            pos.Y = t.TranslationVector.Y;
+                            pos.Z = t.TranslationVector.Z;
+                            
+                            lightStrs.Add($"SGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}");
+                            lightStrs.Add($"Pos {pos.X} {pos.Y} {pos.Z}");
+                            lightStrs.Add($"Rot {asVfx.Header.Rotation.X} {asVfx.Header.Rotation.Y} {asVfx.Header.Rotation.Z}");
+                            lightStrs.Add($"Scale {asVfx.Header.Scale.X} {asVfx.Header.Scale.Y} {asVfx.Header.Scale.Z}");
+                            lightStrs.Add($"LightType {"VFX"}");
+                            lightStrs.Add($"Attenuation {"1"}");
+                            lightStrs.Add($"RangeRate {"1"}");
+                            lightStrs.Add($"PointLightType {"Point"}");
+                            lightStrs.Add($"AttenuationConeCoefficient {"1"}");
+                            lightStrs.Add($"ConeDegree {"45"}");
+                            lightStrs.Add($"TexturePath {asVfx.FilePath}");
+                            lightStrs.Add($"ColorHDRI {vHdr.Color.Red} {vHdr.Color.Green} {vHdr.Color.Blue} {vHdr.Color.Alpha} {"1.0"}");
+                            lightStrs.Add($"FollowsDirectionalLight {"0"}");
+                            lightStrs.Add($"SpecularEnabled {"1"}");
+                            lightStrs.Add($"BGShadowEnabled {"1"}");
+                            lightStrs.Add($"CharacterShadowEnabled {"0"}");
+                            lightStrs.Add($"ShadowClipRange {"10"}");
+                            lightStrs.Add($"PlaneLightRotationX {"0"}");
+                            lightStrs.Add($"PlaneLightRotationY {"0"}");
+                            lightStrs.Add($"MergeGroupID {"0"}");
+
                             lightStrs.Add("");
                         }
                     }
@@ -356,6 +391,7 @@ namespace Godbert.ViewModels {
                 System.IO.File.AppendAllLines(_ExportFileName, vertStr);
                 vertStr.Clear();
                 vs = 1; vn = 1; vt = 1; i = 0;
+                int grp = 0;
                 foreach (var lgb in territory.LgbFiles) {
                     foreach (var lgbGroup in lgb.Groups) {
 
@@ -371,13 +407,16 @@ namespace Godbert.ViewModels {
                                 newGroup = false;
 
                                 System.IO.File.AppendAllLines(_ExportFileName, vertStr);
+                                System.IO.File.AppendAllLines(lightsFileName, lightStrs);
+
+                                lightStrs.Clear();
                                 vertStr.Clear();
 
                                 //vertStr.Add($"o {lgbGroup.Name}");
 
                                 vs = 1; vn = 1; vt = 1; i = 0;
                                 _ExportFileName = $"./{_ExportDirectory}/{teriName}-{lgbGroup.Name}.obj";
-                                lightsFileName = $"./{_ExportDirectory}/{teriName}-{lgbGroup.Name}-lights.txt";
+                                lightsFileName = $"./{_ExportDirectory}/{teriName}-{lgbGroup.Name}_{++grp}-lights.txt";
 
                                 var f = System.IO.File.Create(_ExportFileName);
                                 f.Close();
@@ -479,6 +518,32 @@ namespace Godbert.ViewModels {
                                     lightStrs.Add($"PlaneLightRotationX {lHdr.PlaneLightRotationX}");
                                     lightStrs.Add($"PlaneLightRotationY {lHdr.PlaneLightRotationY}");
                                     lightStrs.Add($"MergeGroupID {lHdr.MergeGroupID}");
+
+                                    lightStrs.Add("");
+                                    break;
+                                case SaintCoinach.Graphics.Lgb.LgbEntryType.Vfx:
+                                    var asVfx = part as SaintCoinach.Graphics.Lgb.LgbVfxEntry;
+                                    var vHdr = asVfx.Header;
+                                    lightStrs.Add($"LGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}");
+                                    lightStrs.Add($"Pos {asVfx.Header.Translation.X} {asVfx.Header.Translation.Y} {asVfx.Header.Translation.Z}");
+                                    lightStrs.Add($"Rot {asVfx.Header.Rotation.X} {asVfx.Header.Rotation.Y} {asVfx.Header.Rotation.Z}");
+                                    lightStrs.Add($"Scale {asVfx.Header.Scale.X} {asVfx.Header.Scale.Y} {asVfx.Header.Scale.Z}");
+                                    lightStrs.Add($"LightType {"VFX"}");
+                                    lightStrs.Add($"Attenuation {"1"}");
+                                    lightStrs.Add($"RangeRate {"1"}");
+                                    lightStrs.Add($"PointLightType {"Point"}");
+                                    lightStrs.Add($"AttenuationConeCoefficient {"1"}");
+                                    lightStrs.Add($"ConeDegree {"45"}");
+                                    lightStrs.Add($"TexturePath {asVfx.FilePath}");
+                                    lightStrs.Add($"ColorHDRI {vHdr.Color.Red} {vHdr.Color.Green} {vHdr.Color.Blue} {vHdr.Color.Alpha} {"1.0"}");
+                                    lightStrs.Add($"FollowsDirectionalLight {"0"}");
+                                    lightStrs.Add($"SpecularEnabled {"1"}");
+                                    lightStrs.Add($"BGShadowEnabled {"1"}");
+                                    lightStrs.Add($"CharacterShadowEnabled {"0"}");
+                                    lightStrs.Add($"ShadowClipRange {"10"}");
+                                    lightStrs.Add($"PlaneLightRotationX {"0"}");
+                                    lightStrs.Add($"PlaneLightRotationY {"0"}");
+                                    lightStrs.Add($"MergeGroupID {"0"}");
 
                                     lightStrs.Add("");
                                     break;

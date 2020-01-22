@@ -16,16 +16,20 @@ namespace SaintCoinach.Graphics.Sgb {
             public Vector3 Translation;
             public Vector3 Rotation;
             public Vector3 Scale;
-            public int AvfxFileOffset;
-            public int Unknown5_2;
-            public int Unknown5_3;
-            public int Unknown5_4;
+            public int ResourceOffset;
+            public float SoftParticleFadeRange;
+            public uint Reserved2;
+            public Lgb.Color Color;
+            public byte AutoPlay;
+            public byte NoFarClip;
+            public ushort Padding;
+            public float NearFadeStart;
+            public float NearFadeEnd;
+            public float FarFadeStart;
+            public float FarFadeEnd;
+            public float ZCorrect;
 
-            public int Unknown6;
-
-            public Vector3 SomeVec3;
-
-//            public int AvfxFileOffset;
+            //            public int AvfxFileOffset;
             // unknowns
         }
         #endregion
@@ -34,7 +38,7 @@ namespace SaintCoinach.Graphics.Sgb {
         public SgbGroupEntryType Type => Header.Type;
         public HeaderData Header { get; private set; }
         public string Name { get; private set; }
-        public string AvfxFilePath { get; private set; }
+        public string FilePath { get; private set; }
         public IO.File AvfxFile { get; private set; }
         #endregion
 
@@ -42,10 +46,10 @@ namespace SaintCoinach.Graphics.Sgb {
         public SgbVfxEntry(IO.PackCollection packs, byte[] buffer, int offset) {
             this.Header = buffer.ToStructure<HeaderData>(offset);
             this.Name = buffer.ReadString(offset + Header.NameOffset);
-            this.AvfxFilePath = buffer.ReadString(offset + Header.AvfxFileOffset);
+            this.FilePath = buffer.ReadString(offset + Header.ResourceOffset);
 
-            if (!string.IsNullOrEmpty(AvfxFilePath))
-                this.AvfxFile = packs.GetFile(AvfxFilePath);
+            if (!string.IsNullOrEmpty(FilePath))
+                this.AvfxFile = packs.GetFile(FilePath);
         }
         #endregion
 
