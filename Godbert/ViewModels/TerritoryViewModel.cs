@@ -336,13 +336,14 @@ namespace Godbert.ViewModels {
                             var vHdr = asVfx.Header;
                             var pos = vHdr.Translation;
                             var transform = (rootGimTransform * currGimTransform) * lgbTransform;
+                            var name = $"SGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}";
 
                             var t = Matrix.Translation(pos.X, pos.Y, pos.Z) * transform;
                             pos.X = t.TranslationVector.X;
                             pos.Y = t.TranslationVector.Y;
                             pos.Z = t.TranslationVector.Z;
-                            
-                            lightStrs.Add($"SGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}");
+
+                            lightStrs.Add(name);
                             lightStrs.Add($"Pos {pos.X} {pos.Y} {pos.Z}");
                             lightStrs.Add($"Rot {asVfx.Header.Rotation.X} {asVfx.Header.Rotation.Y} {asVfx.Header.Rotation.Z}");
                             lightStrs.Add($"Scale {asVfx.Header.Scale.X} {asVfx.Header.Scale.Y} {asVfx.Header.Scale.Z}");
@@ -362,6 +363,54 @@ namespace Godbert.ViewModels {
                             lightStrs.Add($"PlaneLightRotationX {"0"}");
                             lightStrs.Add($"PlaneLightRotationY {"0"}");
                             lightStrs.Add($"MergeGroupID {"0"}");
+                            List<string> vfxObjStr = new List<string>();
+                            string path = name.Replace("/", "_");
+                            string mtlName = path;
+
+                            int vfxPos = 0, vfxN = 0, vfxT = 0, vfxC = 0;
+                            for (int x = 0; x < asVfx.AvfxFile.Models.Count; ++x) {
+                                var model = asVfx.AvfxFile.Models[x];
+
+
+                                vfxObjStr.Add($"mtllib {path}.mtl");
+                                foreach (var vertex in model.ConvertedVertexes) {
+                                    vfxObjStr.Add($"v {vertex.Position.X} {vertex.Position.Y} {vertex.Position.Z} {vertex.Color.X} {vertex.Color.Y} {vertex.Color.Z} {vertex.Color.W}");
+                                    vfxObjStr.Add($"vt {vertex.UV1.X} {vertex.UV2.Y * -1.0f}");
+                                    vfxObjStr.Add($"vn {vertex.Normal.X} {vertex.Normal.Y} {vertex.Normal.Z}");
+                                }
+
+                                vfxObjStr.Add($"g {name}_{x}");
+                                vfxObjStr.Add($"usemtl {mtlName}");
+                                foreach (var face in model.Indices) {
+                                    int f1 = face.I1 + vfxPos + 1;
+                                    int f2 = face.I2 + vfxPos + 1;
+                                    int f3 = face.I3 + vfxPos + 1;
+
+                                    vfxObjStr.Add($"f {f1}/{f1}/{f1} {f2}/{f2}/{f2} {f3}/{f3}/{f3}");
+                                }
+                                vfxPos += model.ConvertedVertexes.Length;
+                            }
+
+                            System.IO.File.WriteAllText($"./{_ExportDirectory}/{path}.mtl", $"newmtl {mtlName}\n");
+
+                            for (int x = 0; x < asVfx.AvfxFile.Textures.Count; ++x) {
+
+                                mtlName = asVfx.AvfxFile.TexturePaths[x].Replace("/", "_");
+                                var img = asVfx.AvfxFile.Textures[x];
+
+                                var ddsBytes = SaintCoinach.Imaging.ImageConverter.GetDDS(img);
+
+                                var fileExt = ddsBytes != null ? ".dds" : ".png";
+
+                                if (fileExt == ".dds")
+                                    System.IO.File.WriteAllBytes($"{_ExportDirectory}/{mtlName}.dds", ddsBytes);
+                                else
+                                    SaintCoinach.Imaging.ImageConverter.Convert(img).Save($"{_ExportDirectory}/{mtlName}.png");
+
+                                System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"map_Kd {mtlName}{fileExt}\n");
+                            }
+
+                            System.IO.File.WriteAllLines($"./{_ExportDirectory}/{name}.obj", vfxObjStr);
 
                             lightStrs.Add("");
                         }
@@ -420,8 +469,8 @@ namespace Godbert.ViewModels {
 
                                 var f = System.IO.File.Create(_ExportFileName);
                                 f.Close();
-                                //f = System.IO.File.Create(lightsFileName);
-                                //f.Close();
+                                f = System.IO.File.Create(lightsFileName);
+                                f.Close();
                             }
 
                             switch (part.Type) {
@@ -439,10 +488,10 @@ namespace Godbert.ViewModels {
                                     for (var j = 0; j < hq.Meshes.Length; ++j) {
                                         var mesh = hq.Meshes[j];
                                         var mtl = mesh.Material.Get();
-                                        var path = mtl.File.Path.Replace('/', '_').Replace(".mtrl", ".tex");
+                                        var path2 = mtl.File.Path.Replace('/', '_').Replace(".mtrl", ".tex");
 
-                                        ExportMaterials(mtl, path);
-                                        ExportMesh(ref mesh, ref lgbTransform, ref path, ref filePath, ref IdentityMatrix, ref IdentityMatrix, ref IdentityMatrix);
+                                        ExportMaterials(mtl, path2);
+                                        ExportMesh(ref mesh, ref lgbTransform, ref path2, ref filePath, ref IdentityMatrix, ref IdentityMatrix, ref IdentityMatrix);
                                     }
                                     break;
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Gimmick:
@@ -524,7 +573,9 @@ namespace Godbert.ViewModels {
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Vfx:
                                     var asVfx = part as SaintCoinach.Graphics.Lgb.LgbVfxEntry;
                                     var vHdr = asVfx.Header;
-                                    lightStrs.Add($"LGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}");
+                                    var name = $"LGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}";
+
+                                    lightStrs.Add(name);
                                     lightStrs.Add($"Pos {asVfx.Header.Translation.X} {asVfx.Header.Translation.Y} {asVfx.Header.Translation.Z}");
                                     lightStrs.Add($"Rot {asVfx.Header.Rotation.X} {asVfx.Header.Rotation.Y} {asVfx.Header.Rotation.Z}");
                                     lightStrs.Add($"Scale {asVfx.Header.Scale.X} {asVfx.Header.Scale.Y} {asVfx.Header.Scale.Z}");
@@ -544,6 +595,55 @@ namespace Godbert.ViewModels {
                                     lightStrs.Add($"PlaneLightRotationX {"0"}");
                                     lightStrs.Add($"PlaneLightRotationY {"0"}");
                                     lightStrs.Add($"MergeGroupID {"0"}");
+
+                                    List<string> vfxObjStr = new List<string>();
+                                    string path = name.Replace("/", "_");
+                                    string mtlName = path;
+
+                                    int vfxPos = 0, vfxN = 0, vfxT = 0, vfxC = 0;
+                                    for (int x = 0; x < asVfx.AvfxFile.Models.Count; ++x) {
+                                        var model = asVfx.AvfxFile.Models[x];
+
+
+                                        vfxObjStr.Add($"mtllib {path}.mtl");
+                                        foreach (var vertex in model.ConvertedVertexes) {
+                                            vfxObjStr.Add($"v {vertex.Position.X} {vertex.Position.Y} {vertex.Position.Z} {vertex.Color.X} {vertex.Color.Y} {vertex.Color.Z} {vertex.Color.W}");
+                                            vfxObjStr.Add($"vt {vertex.UV1.X} {vertex.UV2.Y * -1.0f}");
+                                            vfxObjStr.Add($"vn {vertex.Normal.X} {vertex.Normal.Y} {vertex.Normal.Z}");
+                                        }
+
+                                        vfxObjStr.Add($"g {name}_{x}");
+                                        vfxObjStr.Add($"usemtl {mtlName}");
+                                        foreach (var face in model.Indices) {
+                                            int f1 = face.I1 + vfxPos + 1;
+                                            int f2 = face.I2 + vfxPos + 1;
+                                            int f3 = face.I3 + vfxPos + 1;
+
+                                            vfxObjStr.Add($"f {f1}/{f1}/{f1} {f2}/{f2}/{f2} {f3}/{f3}/{f3}");
+                                        }
+                                        vfxPos += model.ConvertedVertexes.Length;
+                                    }
+
+                                    System.IO.File.WriteAllText($"./{_ExportDirectory}/{path}.mtl", $"newmtl {mtlName}\n");
+
+                                    for (int x = 0; x < asVfx.AvfxFile.Textures.Count; ++x) {
+
+                                        mtlName = asVfx.AvfxFile.TexturePaths[x].Replace("/", "_");
+                                        var img = asVfx.AvfxFile.Textures[x];
+
+                                        var ddsBytes = SaintCoinach.Imaging.ImageConverter.GetDDS(img);
+
+                                        var fileExt = ddsBytes != null ? ".dds" : ".png";
+
+                                        if (fileExt == ".dds")
+                                            System.IO.File.WriteAllBytes($"{_ExportDirectory}/{mtlName}.dds", ddsBytes);
+                                        else
+                                            SaintCoinach.Imaging.ImageConverter.Convert(img).Save($"{_ExportDirectory}/{mtlName}.png");
+
+                                        System.IO.File.AppendAllText($"./{_ExportDirectory}/{path}.mtl", $"map_Kd {mtlName}{fileExt}\n");
+                                    }
+
+                                    System.IO.File.WriteAllLines($"./{_ExportDirectory}/{name}.obj", vfxObjStr);
 
                                     lightStrs.Add("");
                                     break;

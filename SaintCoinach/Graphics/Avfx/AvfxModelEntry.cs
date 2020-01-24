@@ -63,9 +63,9 @@ namespace SaintCoinach.Graphics.Avfx {
         public string Name { get; private set; }
         public string ModelFilePath { get; private set; }
 
-        ConvertedVertex[] ConvertedVertexes;
-        Avfx.Indices[] Indices;
-        AvfxVertex[] AvfxVertexes;
+        public ConvertedVertex[] ConvertedVertexes;
+        public Avfx.Indices[] Indices;
+        public AvfxVertex[] AvfxVertexes;
 
         #endregion
 

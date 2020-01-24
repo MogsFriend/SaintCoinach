@@ -191,7 +191,7 @@ namespace SaintCoinach.Imaging {
             header.dwSize = 124; // why set this if it MUST be 124?
             header.dwHeight = (uint)height;
             header.dwWidth = (uint)width;
-            header.dwMipMapCount = file.ImageHeader._Buffer[0x0E];
+            header.dwMipMapCount = (uint)file.ImageHeader.MipmapCount;
             header.dwCaps = 0x08 | 0x400000 | 0x1000; // DDSCAPS_COMPLEX | DDSCAPS_MIPMAP | DDSCAPS_TEXTURE
 
             header.ddspf = format;

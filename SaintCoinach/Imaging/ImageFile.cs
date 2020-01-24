@@ -27,6 +27,7 @@ namespace SaintCoinach.Imaging {
         public int Height { get { return ImageHeader.Height; } }
         public ImageFormat Format { get { return ImageHeader.Format; } }
 
+        public byte[] Buffer { get; private set; }
         #endregion
 
         #region Constructors
@@ -36,6 +37,14 @@ namespace SaintCoinach.Imaging {
             var stream = GetSourceStream();
             stream.Position = CommonHeader.EndOfHeader;
             ImageHeader = new ImageHeader(stream);
+            Buffer = CommonHeader._Buffer;
+        }
+        public ImageFile(Pack pack, FileCommonHeader commonHeader, byte[] data)
+            : base(pack, commonHeader) {
+            ImageHeader = new ImageHeader(new MemoryStream(data));
+            this._BufferCache = new WeakReference<byte[]>(data);
+            this._BufferCache.SetTarget(data);
+            Buffer = data;
         }
 
         #endregion
@@ -87,19 +96,19 @@ namespace SaintCoinach.Imaging {
             const int CountOffset = 0x14;
             const int EntryLength = 0x14;
             const int BlockInfoOffset = 0x18;
+            var buf = Buffer;
 
-            var count = BitConverter.ToInt16(CommonHeader._Buffer, CountOffset);
+            var count = ImageHeader.MipmapCount;
             var currentOffset = 0;
             var offsets = new List<int>();
 
-            for (var i = BlockInfoOffset + count * EntryLength; i + 2 <= CommonHeader._Buffer.Length; i += 2) {
-                var len = BitConverter.ToUInt16(CommonHeader._Buffer, i);
+            for (var i = BlockInfoOffset + count * EntryLength; i + 2 <= buf.Length; i += 2) {
+                var len = BitConverter.ToUInt16(buf, i);
                 if (len == 0)
                     break;
                 offsets.Add(currentOffset);
                 currentOffset += len;
             }
-
             return offsets.ToArray();
         }
 

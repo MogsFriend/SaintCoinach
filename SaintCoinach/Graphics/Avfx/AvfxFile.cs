@@ -32,9 +32,9 @@ namespace SaintCoinach.Graphics.Avfx {
         public HeaderData Header { get; private set; }
         public IO.File File { get; private set; }
 
-        List<AvfxModelEntry> Models;
-        List<string> TexturePaths;
-        List<SaintCoinach.Imaging.ImageFile> Textures;
+        public List<AvfxModelEntry> Models;
+        public List<string> TexturePaths;
+        public List<SaintCoinach.Imaging.ImageFile> Textures;
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace SaintCoinach.Graphics.Avfx {
 
             int offset = BaseOffset;
             int remaining = offset - Header.FileSize - BaseOffset;
-            while (offset < buffer.Length - BaseOffset) {
+            while (offset < Header.FileSize - 8) {
 
                 int tagInt = buffer.ToStructure<int>(ref offset);
                 string tag = System.Text.ASCIIEncoding.ASCII.GetString(BitConverter.GetBytes(tagInt));
@@ -75,8 +75,12 @@ namespace SaintCoinach.Graphics.Avfx {
                             string texPath = buffer.ReadString(offset);
 
                             var img = File.Pack.GetFile(texPath);
+                            var buf = img.GetData();
+
+                            var img2 = new Imaging.ImageFile(img.Pack, img.CommonHeader, buf);
+                            //var img3 = Imaging.ImageConverter.Convert(img2);
                             TexturePaths.Add(texPath);
-                            //Textures.Add(img);
+                            Textures.Add(img2);
                         }
                         break;
                     case "ldoM":

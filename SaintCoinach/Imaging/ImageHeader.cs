@@ -22,7 +22,9 @@ namespace SaintCoinach.Imaging {
         public int Height { get; private set; }
         public ImageFormat Format { get; private set; }
         public long EndOfHeader { get; private set; }
+        public int MipmapCount { get; private set; }
 
+        public int MipmapOffsets { get; private set; }
         #endregion
 
         #region Constructors
@@ -35,6 +37,8 @@ namespace SaintCoinach.Imaging {
             const int FormatOffset = 0x04;
             const int WidthOffset = 0x08;
             const int HeightOffset = 0x0A;
+            const int MipmapOffset = 0x0E;
+            MipmapOffsets = 0x0E + 12;
 
             _Buffer = new byte[Length];
             if (stream.Read(_Buffer, 0, Length) != Length)
@@ -44,6 +48,7 @@ namespace SaintCoinach.Imaging {
             Height = BitConverter.ToInt16(_Buffer, HeightOffset);
             Format = (ImageFormat)BitConverter.ToInt16(_Buffer, FormatOffset);
             EndOfHeader = stream.Position;
+            MipmapCount = BitConverter.ToInt16(_Buffer, MipmapOffset);
         }
 
         #endregion
