@@ -44,6 +44,7 @@ namespace SaintCoinach.Graphics.Lgb {
         public HeaderData Header { get; private set; }
         public string Name { get; private set; }
         public string FilePath { get; private set; }
+        public Avfx.AvfxFile AvfxFile { get; private set; }
         #endregion
 
         #region Constructor
@@ -51,6 +52,10 @@ namespace SaintCoinach.Graphics.Lgb {
             this.Header = buffer.ToStructure<HeaderData>(offset);
             this.Name = buffer.ReadString(offset + Header.NameOffset);
             this.FilePath = buffer.ReadString(offset + Header.ResourceOffset);
+
+            if (!string.IsNullOrEmpty(FilePath))
+                this.AvfxFile = new Avfx.AvfxFile(packs.GetFile(FilePath));
+
         }
         #endregion
 

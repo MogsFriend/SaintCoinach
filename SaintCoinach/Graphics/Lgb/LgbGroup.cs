@@ -78,6 +78,9 @@ namespace SaintCoinach.Graphics.Lgb {
                         case LgbEntryType.Vfx:
                             Entries[i] = new LgbVfxEntry(Parent.File.Pack.Collection, buffer, entryOffset);
                             break;
+                        case LgbEntryType.EnvLocation:
+                            Entries[i] = new LgbEnvLocationEntry(Parent.File.Pack.Collection, buffer, entryOffset);
+                            break;
                         default:
                             // TODO: Work out other parts.
                             //Debug.WriteLine($"{Parent.File.Path} {type} at 0x{entryOffset:X} in {Name}: Can't read type.");

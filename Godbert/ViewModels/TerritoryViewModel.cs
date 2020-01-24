@@ -420,8 +420,8 @@ namespace Godbert.ViewModels {
 
                                 var f = System.IO.File.Create(_ExportFileName);
                                 f.Close();
-                                f = System.IO.File.Create(lightsFileName);
-                                f.Close();
+                                //f = System.IO.File.Create(lightsFileName);
+                                //f.Close();
                             }
 
                             switch (part.Type) {
