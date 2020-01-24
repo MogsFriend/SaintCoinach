@@ -145,6 +145,8 @@ namespace Godbert.ViewModels {
                 Matrix IdentityMatrix = Matrix.Identity;
 
                 void ExportMaterials(Material m, string path) {
+                    if (true)
+                        return;
                     vertStr.Add($"mtllib {path}.mtl");
                     bool found = false;
                     if (exportedPaths.TryGetValue(path, out found)) {
@@ -204,6 +206,8 @@ namespace Godbert.ViewModels {
                     i++;
                     if (progress.CancellationPending)
                         throw new ExportCancelException("User canceled export");
+                    if (true)
+                        return;
                     var k = 0;
                     UInt64 tempVs = 0, tempVn = 0, tempVt = 0;
                     foreach (var v in mesh.Vertices) {
@@ -336,7 +340,7 @@ namespace Godbert.ViewModels {
                             var vHdr = asVfx.Header;
                             var pos = vHdr.Translation;
                             var transform = (rootGimTransform * currGimTransform) * lgbTransform;
-                            var name = $"SGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}";
+                            var name = $"SGB_VFX_{lights++}_{asVfx.AvfxFile.Models.Count}_{asVfx.Header.UnknownId}";
 
                             var t = Matrix.Translation(pos.X, pos.Y, pos.Z) * transform;
                             pos.X = t.TranslationVector.X;
@@ -372,9 +376,10 @@ namespace Godbert.ViewModels {
                                 var model = asVfx.AvfxFile.Models[x];
 
 
-                                vfxObjStr.Add($"mtllib {path}.mtl");
+                                vfxObjStr.Add($"mtllib ..\\textures\\{path}.mtl");
                                 foreach (var vertex in model.ConvertedVertexes) {
-                                    vfxObjStr.Add($"v {vertex.Position.X} {vertex.Position.Y} {vertex.Position.Z} {vertex.Color.X} {vertex.Color.Y} {vertex.Color.Z} {vertex.Color.W}");
+                                    vfxObjStr.Add($"v {vertex.Position.X} {vertex.Position.Y} {vertex.Position.Z}");
+                                    vfxObjStr.Add($"vc {vertex.Color.W} {vertex.Color.X} {vertex.Color.Y} {vertex.Color.Z}");
                                     vfxObjStr.Add($"vt {vertex.UV1.X} {vertex.UV2.Y * -1.0f}");
                                     vfxObjStr.Add($"vn {vertex.Normal.X} {vertex.Normal.Y} {vertex.Normal.Z}");
                                 }
@@ -437,7 +442,7 @@ namespace Godbert.ViewModels {
                     }
                 }
 
-                System.IO.File.AppendAllLines(_ExportFileName, vertStr);
+                //System.IO.File.AppendAllLines(_ExportFileName, vertStr);
                 vertStr.Clear();
                 vs = 1; vn = 1; vt = 1; i = 0;
                 int grp = 0;
@@ -455,7 +460,7 @@ namespace Godbert.ViewModels {
 
                                 newGroup = false;
 
-                                System.IO.File.AppendAllLines(_ExportFileName, vertStr);
+                                //System.IO.File.AppendAllLines(_ExportFileName, vertStr);
                                 System.IO.File.AppendAllLines(lightsFileName, lightStrs);
 
                                 lightStrs.Clear();
@@ -573,7 +578,7 @@ namespace Godbert.ViewModels {
                                 case SaintCoinach.Graphics.Lgb.LgbEntryType.Vfx:
                                     var asVfx = part as SaintCoinach.Graphics.Lgb.LgbVfxEntry;
                                     var vHdr = asVfx.Header;
-                                    var name = $"LGB_VFX_{lights++}_{asVfx.Name}_{asVfx.Header.UnknownId}";
+                                    var name = $"LGB_VFX_{lights++}_{asVfx.AvfxFile.Models.Count}_{asVfx.Header.UnknownId}";
 
                                     lightStrs.Add(name);
                                     lightStrs.Add($"Pos {asVfx.Header.Translation.X} {asVfx.Header.Translation.Y} {asVfx.Header.Translation.Z}");
@@ -605,9 +610,10 @@ namespace Godbert.ViewModels {
                                         var model = asVfx.AvfxFile.Models[x];
 
 
-                                        vfxObjStr.Add($"mtllib {path}.mtl");
+                                        vfxObjStr.Add($"mtllib ..\\textures\\{path}.mtl");
                                         foreach (var vertex in model.ConvertedVertexes) {
-                                            vfxObjStr.Add($"v {vertex.Position.X} {vertex.Position.Y} {vertex.Position.Z} {vertex.Color.X} {vertex.Color.Y} {vertex.Color.Z} {vertex.Color.W}");
+                                            vfxObjStr.Add($"v {vertex.Position.X} {vertex.Position.Y} {vertex.Position.Z}");
+                                            vfxObjStr.Add($"vc {vertex.Color.W} {vertex.Color.X} {vertex.Color.Y} {vertex.Color.Z}");
                                             vfxObjStr.Add($"vt {vertex.UV1.X} {vertex.UV2.Y * -1.0f}");
                                             vfxObjStr.Add($"vn {vertex.Normal.X} {vertex.Normal.Y} {vertex.Normal.Z}");
                                         }
