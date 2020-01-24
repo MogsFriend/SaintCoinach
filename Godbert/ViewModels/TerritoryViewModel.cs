@@ -370,7 +370,7 @@ namespace Godbert.ViewModels {
                             List<string> vfxObjStr = new List<string>();
                             string path = name.Replace("/", "_");
                             string mtlName = path;
-
+                            /*
                             int vfxPos = 0, vfxN = 0, vfxT = 0, vfxC = 0;
                             for (int x = 0; x < asVfx.AvfxFile.Models.Count; ++x) {
                                 var model = asVfx.AvfxFile.Models[x];
@@ -395,7 +395,7 @@ namespace Godbert.ViewModels {
                                 }
                                 vfxPos += model.ConvertedVertexes.Length;
                             }
-
+                            */
                             System.IO.File.WriteAllText($"./{_ExportDirectory}/{path}.mtl", $"newmtl {mtlName}\n");
 
                             for (int x = 0; x < asVfx.AvfxFile.Textures.Count; ++x) {
@@ -605,6 +605,7 @@ namespace Godbert.ViewModels {
                                     string path = name.Replace("/", "_");
                                     string mtlName = path;
 
+                                    /*
                                     int vfxPos = 0, vfxN = 0, vfxT = 0, vfxC = 0;
                                     for (int x = 0; x < asVfx.AvfxFile.Models.Count; ++x) {
                                         var model = asVfx.AvfxFile.Models[x];
@@ -629,7 +630,7 @@ namespace Godbert.ViewModels {
                                         }
                                         vfxPos += model.ConvertedVertexes.Length;
                                     }
-
+                                    */
                                     System.IO.File.WriteAllText($"./{_ExportDirectory}/{path}.mtl", $"newmtl {mtlName}\n");
 
                                     for (int x = 0; x < asVfx.AvfxFile.Textures.Count; ++x) {

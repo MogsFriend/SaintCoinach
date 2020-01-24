@@ -41,14 +41,6 @@ namespace SaintCoinach.Graphics.Avfx {
         public ushort I3;
     }
 
-    public struct ConvertedVertex {
-        public Vector4 Position;
-        public Vector4 Normal;
-        public Vector4 Tangent;
-        public Vector4 Color;
-        public Vector4 UV1;
-        public Vector4 UV2;
-    }
     public class AvfxModelEntry : IAvfxEntry {
         #region Struct
         [StructLayout(LayoutKind.Sequential)]
@@ -63,7 +55,7 @@ namespace SaintCoinach.Graphics.Avfx {
         public string Name { get; private set; }
         public string ModelFilePath { get; private set; }
 
-        public ConvertedVertex[] ConvertedVertexes;
+        public Vertex[] ConvertedVertexes;
         public Avfx.Indices[] Indices;
         public AvfxVertex[] AvfxVertexes;
 
@@ -73,7 +65,7 @@ namespace SaintCoinach.Graphics.Avfx {
         public AvfxModelEntry(IO.File file, byte[] buffer, int offset) {
             this.Header = buffer.ToStructure<HeaderData>(ref offset);
             int initialOffset = offset;
-            ConvertedVertexes = new List<ConvertedVertex>().ToArray();
+            ConvertedVertexes = new Vertex[1];
             AvfxVertexes = new List<AvfxVertex>().ToArray();
             Indices = new List<Indices>().ToArray();
 
@@ -99,52 +91,53 @@ namespace SaintCoinach.Graphics.Avfx {
                         //offset += 4;
                         int numV = buffer.ToStructure<int>(ref offset) / System.Runtime.InteropServices.Marshal.SizeOf(new AvfxVertex());
                         AvfxVertexes = new AvfxVertex[numV];
-                        ConvertedVertexes = new ConvertedVertex[numV];
+                        ConvertedVertexes = new Vertex[numV];
 
                         for (int i = 0; i < numV; ++i) {
                             var v = buffer.ToStructure<AvfxVertex>(ref offset);
                             AvfxVertexes[i] = v;
 
-                            ConvertedVertex converted = new ConvertedVertex();
-                            converted.Position = new Vector4();
-                            converted.Position.X = (float)(v.Position.X / 32768.0f);
-                            converted.Position.Y = (float)(v.Position.Y / 32768.0f);
-                            converted.Position.Z = (float)(v.Position.Z / 32768.0f);
-                            converted.Position.W = (float)(v.Position.W / 32768.0f);
+                            Vector4 Position = new Vector4();
+                            Position.X = (float)(v.Position.X / 32768.0f);
+                            Position.Y = (float)(v.Position.Y / 32768.0f);
+                            Position.Z = (float)(v.Position.Z / 32768.0f);
+                            Position.W = (float)(v.Position.W / 32768.0f);
 
-                            converted.Normal = new Vector4();
-                            converted.Normal.X = (float)(v.Normal.X / 255.0f);
-                            converted.Normal.Y = (float)(v.Normal.Y / 255.0f);
-                            converted.Normal.Z = (float)(v.Normal.Z / 255.0f);
-                            converted.Normal.W = (float)(v.Normal.W / 255.0f);
+                            Vector3 Normal = new Vector3();
+                            Normal.X = (float)(v.Normal.X / 255.0f);
+                            Normal.Y = (float)(v.Normal.Y / 255.0f);
+                            Normal.Z = (float)(v.Normal.Z / 255.0f);
+                            //Normal.W = (float)(v.Normal.W / 255.0f);
 
-                            converted.Tangent = new Vector4();
-                            converted.Tangent.X = (float)(v.Tangent.X / 255.0f);
-                            converted.Tangent.Y = (float)(v.Tangent.Y / 255.0f);
-                            converted.Tangent.Z = (float)(v.Tangent.Z / 255.0f);
-                            converted.Tangent.W = (float)(v.Tangent.W / 255.0f);
-
-                            converted.Color = new Vector4();
-                            converted.Color.X = (float)(v.Color.X / 255.0f);
-                            converted.Color.Y = (float)(v.Color.Y / 255.0f);
-                            converted.Color.Z = (float)(v.Color.Z / 255.0f);
-                            converted.Color.W = (float)(v.Color.W / 255.0f);
+                            Vector4 Tangent1 = new Vector4();
+                            Tangent1.X = (float)(v.Tangent.X / 255.0f);
+                            Tangent1.Y = (float)(v.Tangent.Y / 255.0f);
+                            Tangent1.Z = (float)(v.Tangent.Z / 255.0f);
+                            Tangent1.W = (float)(v.Tangent.W / 255.0f);
 
 
-                            converted.UV1 = new Vector4();
-                            converted.UV1.X = (float)(v.UV1.X / 32768.0f);
-                            converted.UV1.Y = (float)(v.UV1.Y / 32768.0f);
-                            converted.UV1.Z = (float)(v.UV1.Z / 32768.0f);
-                            converted.UV1.W = (float)(v.UV1.W / 32768.0f);
+                            Vector4 Color = new Vector4();
+                            Color.X = (float)(v.Color.X / 255.0f);
+                            Color.Y = (float)(v.Color.Y / 255.0f);
+                            Color.Z = (float)(v.Color.Z / 255.0f);
+                            Color.W = (float)(v.Color.W / 255.0f);
 
 
-                            converted.UV2 = new Vector4();
-                            converted.UV2.X = (float)(v.UV2.X / 32768.0f);
-                            converted.UV2.Y = (float)(v.UV2.Y / 32768.0f);
-                            converted.UV2.Z = (float)(v.UV2.Z / 32768.0f);
-                            converted.UV2.W = (float)(v.UV2.W / 32768.0f);
+                            Vector4 UV = new Vector4();
+                            UV.X = (float)(v.UV1.X / 32768.0f);
+                            UV.Y = (float)(v.UV1.Y / 32768.0f);
+                            UV.Z = (float)(v.UV2.Z / 32768.0f);
+                            UV.W = (float)(v.UV2.W / 32768.0f);
+
+                            Vertex converted = new Vertex();
+                            converted.Position = Position;
+                            converted.Normal = Normal;
+                            converted.Tangent1 = Tangent1;
+                            converted.Color = Color;
+                            converted.UV = UV;
 
                             ConvertedVertexes[i] = converted;
+
                             //System.Diagnostics.Debug.WriteLine("");
                         }
                     }
