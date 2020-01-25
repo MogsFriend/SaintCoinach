@@ -65,7 +65,7 @@ namespace SaintCoinach.Graphics.Avfx {
         public AvfxModelEntry(IO.File file, byte[] buffer, int offset) {
             this.Header = buffer.ToStructure<HeaderData>(ref offset);
             int initialOffset = offset;
-            ConvertedVertexes = new Vertex[1];
+
             AvfxVertexes = new List<AvfxVertex>().ToArray();
             Indices = new List<Indices>().ToArray();
 
