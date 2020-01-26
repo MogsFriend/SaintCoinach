@@ -69,7 +69,8 @@ namespace SaintCoinach.Graphics.Avfx {
             AvfxVertexes = new List<AvfxVertex>().ToArray();
             Indices = new List<Indices>().ToArray();
 
-            this.Name = file.Path.Substring(file.Path.LastIndexOf("/") + 1);
+            this.Name = System.IO.Path.GetFileNameWithoutExtension(file.Path) + "_" + initialOffset;
+            this.ModelFilePath = file.Path;
 
             string tag = "";
 

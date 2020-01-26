@@ -47,8 +47,8 @@ namespace SaintCoinach.Imaging {
             Width = BitConverter.ToInt16(_Buffer, WidthOffset);
             Height = BitConverter.ToInt16(_Buffer, HeightOffset);
             Format = (ImageFormat)BitConverter.ToInt16(_Buffer, FormatOffset);
-            EndOfHeader = stream.Position;
             MipmapCount = BitConverter.ToInt16(_Buffer, MipmapOffset);
+            EndOfHeader = stream.Position;
         }
 
         #endregion

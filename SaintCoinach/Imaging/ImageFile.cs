@@ -42,9 +42,12 @@ namespace SaintCoinach.Imaging {
         public ImageFile(Pack pack, FileCommonHeader commonHeader, byte[] data)
             : base(pack, commonHeader) {
             ImageHeader = new ImageHeader(new MemoryStream(data));
-            this._BufferCache = new WeakReference<byte[]>(data);
-            this._BufferCache.SetTarget(data);
-            Buffer = data;
+            var len = data.Length - ImageHeader.EndOfHeader;
+            Buffer = new byte[len];
+            System.Buffer.BlockCopy(data, (int)ImageHeader.EndOfHeader, Buffer, 0, (int)len);
+
+            this._BufferCache = new WeakReference<byte[]>(Buffer);
+            this._BufferCache.SetTarget(Buffer);
         }
 
         #endregion
