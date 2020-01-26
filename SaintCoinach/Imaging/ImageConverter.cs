@@ -142,6 +142,9 @@ namespace SaintCoinach.Imaging {
         /// </summary>
 
         public static byte[] GetDDS(ImageFile file) {
+            if (file.ImageHeader.Format == ImageFormat.A8R8G8B8_Cube)
+                return null;
+
             var bytes2 = file.GetData();
             //var offset = bytes2[file.ImageHeader.EndOfHeader];
             var width = file.ImageHeader.Width;

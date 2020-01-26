@@ -37,7 +37,6 @@ namespace SaintCoinach.Imaging {
             var stream = GetSourceStream();
             stream.Position = CommonHeader.EndOfHeader;
             ImageHeader = new ImageHeader(stream);
-            Buffer = CommonHeader._Buffer;
         }
         public ImageFile(Pack pack, FileCommonHeader commonHeader, byte[] data)
             : base(pack, commonHeader) {
@@ -70,6 +69,9 @@ namespace SaintCoinach.Imaging {
         public override byte[] GetData() {
             if (_BufferCache != null && _BufferCache.TryGetTarget(out var buffer)) return buffer;
 
+            if (Buffer != null)
+                return Buffer;
+
             buffer = Read();
 
             if (_BufferCache == null)
@@ -99,7 +101,7 @@ namespace SaintCoinach.Imaging {
             const int CountOffset = 0x14;
             const int EntryLength = 0x14;
             const int BlockInfoOffset = 0x18;
-            var buf = Buffer;
+            var buf = Buffer ?? CommonHeader._Buffer;
 
             var count = ImageHeader.MipmapCount;
             var currentOffset = 0;
