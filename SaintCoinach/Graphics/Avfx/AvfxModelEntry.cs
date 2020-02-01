@@ -73,6 +73,7 @@ namespace SaintCoinach.Graphics.Avfx {
             this.ModelFilePath = file.Path;
 
             string tag = "";
+            int faceCount = 0;
 
             while (offset < this.Header.Length + initialOffset) {
                 try {
@@ -99,10 +100,10 @@ namespace SaintCoinach.Graphics.Avfx {
                             AvfxVertexes[i] = v;
 
                             Vector4 Position = new Vector4();
-                            Position.X = (float)(v.Position.X / 32768.0f);
-                            Position.Y = (float)(v.Position.Y / 32768.0f);
-                            Position.Z = (float)(v.Position.Z / 32768.0f);
-                            Position.W = (float)(v.Position.W / 32768.0f);
+                            Position.X = HalfHelper.Unpack(v.Position.X);
+                            Position.Y = HalfHelper.Unpack(v.Position.Y);
+                            Position.Z = HalfHelper.Unpack(v.Position.Z);
+                            Position.W = HalfHelper.Unpack(v.Position.W);
 
                             Vector3 Normal = new Vector3();
                             Normal.X = (float)(v.Normal.X / 255.0f);
@@ -125,10 +126,10 @@ namespace SaintCoinach.Graphics.Avfx {
 
 
                             Vector4 UV = new Vector4();
-                            UV.X = (float)(v.UV1.X / 32768.0f);
-                            UV.Y = (float)(v.UV1.Y / 32768.0f);
-                            UV.Z = (float)(v.UV2.Z / 32768.0f);
-                            UV.W = (float)(v.UV2.W / 32768.0f);
+                            UV.X = HalfHelper.Unpack(v.UV1.X);
+                            UV.Y = HalfHelper.Unpack(v.UV1.Y);
+                            UV.Z = HalfHelper.Unpack(v.UV2.Z);
+                            UV.W = HalfHelper.Unpack(v.UV2.W);
 
                             Vertex converted = new Vertex();
                             converted.Position = Position;
