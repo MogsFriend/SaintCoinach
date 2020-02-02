@@ -160,6 +160,45 @@ namespace SaintCoinach.Graphics.Avfx {
                     System.Diagnostics.Debug.WriteLine($"unable to read tag {tag} buffer offset {offset} {e.Message}");
                 }
             }
+
+            if (this.AvfxVertexes.Length == 0) {
+                List<Vertex> convertedVertex = new List<Vertex>();
+                // make a triangle
+                {
+                    Vector4 pos = new Vector4();
+                    pos.X = 0.0f; pos.Y = 0.5f; pos.Z = 0.0f;
+
+                    Vertex v = new Vertex();
+                    v.Position = pos;
+                    v.UV = new Vector4();
+                    v.Normal = new Vector3();
+                    convertedVertex.Add(v);
+                }
+                {
+                    Vector4 pos = new Vector4();
+                    pos.X = 0.45f; pos.Y = -0.5f; pos.Z = 0.0f;
+
+                    Vertex v = new Vertex();
+                    v.Position = pos;
+                    v.UV = new Vector4();
+                    v.Normal = new Vector3();
+                    convertedVertex.Add(v);
+                }
+                {
+                    Vector4 pos = new Vector4();
+                    pos.X = -0.45f; pos.Y = -0.5f; pos.Z = 0.0f;
+
+                    Vertex v = new Vertex();
+                    v.Position = pos;
+                    v.UV = new Vector4();
+                    v.Normal = new Vector3();
+                    convertedVertex.Add(v);
+                }
+                this.ConvertedVertexes = convertedVertex.ToArray();
+
+                List<Indices> indices = new List<Indices>() { new Indices { I1 = 0, I2 = 1, I3 = 2 } };
+                Indices = indices.ToArray();
+            }
         }
         #endregion
     }
