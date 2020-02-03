@@ -30,8 +30,8 @@ namespace SaintCoinach.Graphics.Sgb {
             public uint Unknown38;
             public uint Unknown3C;
 
-            public uint Unknown40;
-            public uint Unknown44;
+            public uint ObjectBehaviourOffset;
+            public uint ObjectBehaviourCount;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -52,6 +52,15 @@ namespace SaintCoinach.Graphics.Sgb {
             public int NameOffset2;
             public Vector3 UnknownFloat3_3;
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ObjectBehaviour {
+            public Lgb.LgbEntryType Type;
+            public uint InstanceId;
+            public byte Enabled;
+            public byte Emissive;
+            public ushort Unk;
+        }
         #endregion
 
         #region Properties
@@ -62,6 +71,7 @@ namespace SaintCoinach.Graphics.Sgb {
         public List<string> States;
         public SgbFile Parent { get; private set; }
         public ISgbGroupEntry[] Entries { get; private set; }
+        public ObjectBehaviour[] ObjectBehaviours { get; private set; }
         #endregion
 
         #region Constructor
@@ -126,6 +136,18 @@ namespace SaintCoinach.Graphics.Sgb {
                     }
                     catch (Exception e) {
                         System.Diagnostics.Debug.WriteLine(e.Message);
+                    }
+                }
+                this.ObjectBehaviours = new ObjectBehaviour[Header.ObjectBehaviourCount];
+                var structSize = Marshal.SizeOf(new ObjectBehaviour());
+                for (var i = 0; i < this.ObjectBehaviours.Length; ++i) {
+                    // offset + fileHdr + obsetOffset + obsetEntryOffset
+                    this.ObjectBehaviours[i] = buffer.ToStructure<ObjectBehaviour>(offset + 20 + (int)Header.ObjectBehaviourOffset + (i * structSize));
+                    foreach (var mdl in this.Entries.OfType<SgbModelEntry>()) {
+                        if (mdl.Header.GimmickId == ObjectBehaviours[i].InstanceId) {
+                            mdl.IsEmissive = ObjectBehaviours[i].Emissive == 1 ? true : false;
+                            break;
+                        }
                     }
                 }
             }

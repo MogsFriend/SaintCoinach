@@ -30,6 +30,8 @@ namespace SaintCoinach.Graphics.Sgb {
         public string CollisionFilePath { get; private set; }
         public TransformedModel Model { get; private set; }
         public Pcb.PcbFile CollisionFile { get; private set; }
+        // todo:
+        public bool IsEmissive { get; set; }
         #endregion
 
         #region Constructor
