@@ -9,6 +9,7 @@ namespace SaintCoinach.Graphics.Sgb {
         Model = 0x01,
         Light = 0x03,
         Vfx = 0x04,
-        Gimmick = 0x06
+        Gimmick = 0x06,
+        Sound = 0x07
     }
 }

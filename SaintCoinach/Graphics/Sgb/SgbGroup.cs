@@ -128,6 +128,9 @@ namespace SaintCoinach.Graphics.Sgb {
                             case SgbGroupEntryType.Vfx:
                                 Entries[i] = new SgbVfxEntry(Parent.File.Pack.Collection, buffer, entryOffset);
                                 break;
+                            case SgbGroupEntryType.Sound:
+                                Entries[i] = new SgbSoundEntry(Parent.File.Pack.Collection, buffer, entryOffset);
+                                break;
                             default:
                                 //System.Diagnostics.Trace.WriteLine(string.Format("{0}: Type {1} at 0x{2:X} in {3}", Parent.File.Path, type, entryOffset, Name));
                                 break;

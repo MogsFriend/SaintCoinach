@@ -78,6 +78,9 @@ namespace SaintCoinach.Graphics.Lgb {
                         case LgbEntryType.Vfx:
                             Entries[i] = new LgbVfxEntry(Parent.File.Pack.Collection, buffer, entryOffset);
                             break;
+                        case LgbEntryType.Sound:
+                            Entries[i] = new LgbSoundEntry(Parent.File.Pack.Collection, buffer, entryOffset);
+                            break;
                         case LgbEntryType.EnvLocation:
                             Entries[i] = new LgbEnvLocationEntry(Parent.File.Pack.Collection, buffer, entryOffset);
                             break;
