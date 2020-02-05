@@ -18,7 +18,7 @@ namespace SaintCoinach.Graphics.Sgb {
             public uint Unknown10;
             public int SharedOffset;
             public uint Unknown18;
-            public int Offset1C;
+            public int Unknown1C;
 
             public uint Unknown20;
             public int StatesOffset;
@@ -26,7 +26,7 @@ namespace SaintCoinach.Graphics.Sgb {
             public uint Unknown2C;
 
             public uint Unknown30;
-            public uint Unknown34;
+            public int SGSettingsOffset;
             public uint Unknown38;
             public uint Unknown3C;
 
@@ -42,6 +42,7 @@ namespace SaintCoinach.Graphics.Sgb {
 
         #region Properties
         public HeaderData Header { get; private set; }
+        public SGSettings SGSettings { get; private set; }
         public IO.File File { get; private set; }
         public ISgbData[] Data { get; private set; }
         #endregion
@@ -68,7 +69,8 @@ namespace SaintCoinach.Graphics.Sgb {
 
             try {
                 data.Add(new SgbGroup(this, buffer, BaseOffset + Header.SharedOffset));
-                data.Add(new SgbGroup(this, buffer, BaseOffset + Header.Offset1C, true));
+                this.SGSettings = new SGSettings(this, buffer, BaseOffset + Header.SGSettingsOffset);
+                //data.Add(new SgbGroup(this, buffer, BaseOffset + Header.Settings, true));
                 //data.Add(new SgbGroup(this, buffer, BaseOffset + Header.Unknown1));
             }
             catch (Exception ex) {
