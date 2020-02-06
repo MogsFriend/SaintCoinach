@@ -75,7 +75,7 @@ namespace SaintCoinach.Graphics.Avfx {
             string tag = "";
             int faceCount = 0;
 
-            while (offset < this.Header.Length + initialOffset) {
+            while (offset < this.Header.Length + initialOffset - 2) {
                 try {
                     int tagInt = buffer.ToStructure<int>(ref offset);
 
