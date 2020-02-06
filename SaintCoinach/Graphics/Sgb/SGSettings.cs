@@ -54,7 +54,7 @@ namespace SaintCoinach.Graphics.Sgb {
         public struct SGAnimRotation {
             public uint TargetSGEntryID;
             public SGRotationAxis Axis;
-            public float Duration;
+            public float FullRotationTime;
             public float UnknownFloat;
             public byte TargetSGVfx;
             public byte TargetSGVfxRotationEnabled; // true/false
@@ -91,7 +91,15 @@ namespace SaintCoinach.Graphics.Sgb {
                 entryOffset += 12;
                 switch (type) {
                     case SGAnimType.Rotation:
-                        Rotations.Add(buffer.ToStructure<SGAnimRotation>(entryOffset));
+                        var anim = buffer.ToStructure<SGAnimRotation>(entryOffset);
+                        Rotations.Add(anim);
+                        if (parent.SGAnimRotationTargetMap.ContainsKey(anim.TargetSGEntryID)) {
+                            parent.SGAnimRotationTargetMap[anim.TargetSGEntryID].Add(anim);
+                        }
+                        else {
+                            parent.SGAnimRotationTargetMap.Add(anim.TargetSGEntryID, new List<SGAnimRotation>() { anim });
+                        }
+
                         break;
                     default:
                         System.Diagnostics.Debug.WriteLine($"SGAnimType {type.ToString()} not implemented!");
