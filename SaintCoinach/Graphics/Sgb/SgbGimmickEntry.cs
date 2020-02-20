@@ -24,15 +24,19 @@ namespace SaintCoinach.Graphics.Sgb {
         #endregion
 
         #region Properties
-        SgbGroupEntryType ISgbGroupEntry.Type { get { return Header.Type; } }
-        public HeaderData Header { get; private set; }
+        SgbGroupEntryType ISgbGroupEntry.Type { get { return (SgbGroupEntryType)Header.Type; } }
+        public Lgb.LgbGimmickEntry.HeaderData Header { get; private set; }
         public string Name { get; private set; }
         public SgbFile Gimmick { get; private set; }
+        public Lgb.LgbGimmickEntry.MovePathSettings MovePathSettings { get; private set; }
         #endregion
 
         #region Constructor
         public SgbGimmickEntry(IO.PackCollection packs, byte[] buffer, int offset) {
-            this.Header = buffer.ToStructure<HeaderData>(offset);
+            this.Header = buffer.ToStructure<Lgb.LgbGimmickEntry.HeaderData>(offset);
+
+            this.MovePathSettings = buffer.ToStructure<Lgb.LgbGimmickEntry.MovePathSettings>(offset + Header.MovePathSetting);
+
             this.Name = buffer.ReadString(offset + Header.NameOffset);
 
             var sgbFileName = buffer.ReadString(offset + Header.GimmickFileOffset);
