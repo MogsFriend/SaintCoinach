@@ -39,6 +39,18 @@ namespace SaintCoinach.Graphics {
                 TryGetLgb("level/vfx.lgb"), TryGetLgb("level/planlive.lgb"), TryGetLgb("level/sound.lgb") };
             this.LgbFiles = lgbFiles.Where(l => l != null).ToArray();
         }
+
+        public static bool LgbFileExists(IO.PackCollection packs, Xiv.TerritoryType teri) {
+            var levelPath = (string)teri.Bg;
+            var i = levelPath.IndexOf("/level/");
+            levelPath = "bg/" + levelPath.Substring(0, i + 1);
+
+            if (packs.TryGetFile(levelPath + "level/bg.lgb", out var file))
+                return true;
+
+            return false;
+        }
+
         private Lgb.LgbFile TryGetLgb(string name) {
             var path = BasePath + name;
             if (Packs.TryGetFile(path, out var file))
