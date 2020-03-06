@@ -14,11 +14,13 @@ namespace SaintCoinach.Graphics {
         public ushort PartCount;
         public ushort MaterialCount;
         public ushort BoneCount;
+
         public ushort UnknownStruct4Count;  // 3 in hsl
         public ushort UnknownStruct5Count;  // 4 in hsl
         public ushort UnknownStruct6Count;  // 5 in hsl
         public ushort UnknownStruct7Count;  // 6 in hsl
-        public ushort Unknown2;
+        public byte LODNum;
+        public byte Unknown2;
         public ushort UnknownStruct1Count;  // 0 in hsl
         public byte UnknownStruct2Count;  // 1 in hsl
         public byte Unknown3;
