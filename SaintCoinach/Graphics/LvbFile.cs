@@ -28,7 +28,7 @@ namespace SaintCoinach.Graphics {
 
             if ((Header.FileID[0] != 'L' && Header.FileID[0] != 'S')
                 || (Header.FileID[1] != 'V' && Header.FileID[1] != 'G') || Header.FileID[2] != 'B' /*|| Header.FileID[3] != '\0'*/) {
-                throw new InvalidCastException("Not a valid LVB file!");
+                //throw new InvalidCastException("Not a valid LVB file!");
             }
 
             //if (Header.FileID[0] != 'L' || Header.FileID[1] != 'V' || Header.FileID[2] != 'B' /*|| Header.FileID[3] != '\0'*/) {
@@ -40,7 +40,7 @@ namespace SaintCoinach.Graphics {
 
             offset += 12;
             try {
-                while (offset + 4 < Header.FileSize) {
+                while (offset + 4 < file.CommonHeader.Length) {
                     while (data[offset] == 0)
                         offset++;
 
@@ -57,9 +57,10 @@ namespace SaintCoinach.Graphics {
 
                         if (testStr[0] == '?')
                             testStr = testStr.Substring(1);
-                        if (testStr[0] == 'b' && testStr[1] == 'g')
+                        if (testStr[0] == 'b' && testStr[1] == 'g' && testStr.Contains('/')) {
                             LgbPaths.Add(testStr);
-                        IsValidLvb = true;
+                            IsValidLvb = true;
+                        }
                     }
                     offset += testStr.Length;
                 }
