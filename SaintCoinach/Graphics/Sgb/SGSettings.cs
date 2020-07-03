@@ -122,6 +122,34 @@ namespace SaintCoinach.Graphics.Sgb {
             public eSGAnimTransformMovementType MovementType;
         }
 
+        public enum eOpenStyle {
+            Rotation_0 = 0x0,
+            HorizontalSlide = 0x1,
+            VerticalSlide = 0x2,
+        };
+
+        public enum eCurveType {
+            Spline_0 = 0x1,
+            Linear = 0x2,
+            Acceleration1 = 0x3,
+            Deceleration1 = 0x4,
+        };
+
+        public struct SGAnimDoor {
+            public byte DoorInstanceID1;
+            public byte DoorInstanceID2;
+            public short Padding01;
+            public eOpenStyle OpenStyle;
+            public float TimeLength;
+            public float OpenAngle;
+            public float OpenDistance;
+            public byte SoundAtOpening;
+            public byte SoundAtClosing;
+            public byte DoorInstanceID3;
+            public byte DoorInstanceID4;
+            public eCurveType CurveType;
+            public SGRotationAxis RotationAxis;
+        };
 
         #endregion
 
@@ -130,6 +158,8 @@ namespace SaintCoinach.Graphics.Sgb {
         public SgbFile Parent { get; private set; }
         public List<SGAnimRotation> Rotations { get; private set; }
         public List<SGAnimTransform2> Transformations { get; private set; }
+
+        public List<SGAnimDoor> Doors { get; private set; }
         #endregion
 
         #region Constructor
@@ -137,6 +167,7 @@ namespace SaintCoinach.Graphics.Sgb {
             this.Parent = parent;
             this.Rotations = new List<SGAnimRotation>();
             this.Transformations = new List<SGAnimTransform2>();
+            this.Doors = new List<SGAnimDoor>();
 
             this.Header = buffer.ToStructure<HeaderData>(offset);
             int animContainerOffset = offset + Header.AnimContainerOffset;
@@ -186,6 +217,39 @@ namespace SaintCoinach.Graphics.Sgb {
 
                             }
                             Transformations.Add(anim2);
+                        }
+                        break;
+                    case SGAnimType.Door:
+                        {
+                            var anim = buffer.ToStructure<SGAnimDoor>(entryOffset);
+                            Doors.Add(anim);
+
+                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID1))
+                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID1].Add(anim);
+                            else
+                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID1, new List<SGAnimDoor>() { anim });
+
+
+                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID2))
+                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID2].Add(anim);
+                            else
+                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID2, new List<SGAnimDoor>() { anim });
+
+                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID3))
+                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID3].Add(anim);
+                            else
+                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID3, new List<SGAnimDoor>() { anim });
+
+                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID3))
+                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID3].Add(anim);
+                            else
+                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID3, new List<SGAnimDoor>() { anim });
+
+
+                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID4))
+                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID4].Add(anim);
+                            else
+                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID4, new List<SGAnimDoor>() { anim });
                         }
                         break;
                     default:
