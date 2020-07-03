@@ -64,19 +64,79 @@ namespace SaintCoinach.Graphics.Sgb {
             public byte TargetSGVfx2;
             public byte TargetSGVfx2RotationEnabled;
             public byte Padding;
+        };
+
+        public enum eSGAnimTransformCurveType {
+            CurveLinear = 0x0,
+            CurveSpline = 0x1,
+            CurveAcceleration = 0x2,
+            CurveDeceleration = 0x3,
+        };
+
+        public enum eSGAnimTransformMovementType {
+            MovementOneWay = 0x0,
+            MovementRoundTrip = 0x1,
+            MovementRepetition = 0x2,
+        };
+
+        public struct SGAnimTransformItem {
+            public byte Enabled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] Padding00;
+            public Vector3 Offset;
+            public float RandomRate;
+            public uint Time;
+            public uint StartEndTime;
+            public eSGAnimTransformCurveType CurveType;
+            public eSGAnimTransformMovementType MovementType;
+        };
+
+        public struct SGAnimTransform// : SGAction
+        {
+            public int TargetSGMemberIDs;
+            public int TargetSGMemberIDCount;
+            public byte Loop;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] Padding01;
+            public uint Reserved2;
+            public int Translation;
+            public int Rotation;
+            public int Scale;
+            public SGAnimTransformItem ItemTransform;
+        };
+
+        public struct SGAnimTransform2
+        {
+            public uint[] TargetSGMemberIDs;
+            public byte Loop;
+            public Vector3 Translation;
+            public Vector3 Rotation;
+            public Vector3 Scale;
+
+            public byte Enabled;
+            public Vector3 Offset;
+            public float RandomRate;
+            public uint Time;
+            public uint StartEndTime;
+            public eSGAnimTransformCurveType CurveType;
+            public eSGAnimTransformMovementType MovementType;
         }
+
+
         #endregion
 
         #region Properties
         public HeaderData Header { get; private set; }
         public SgbFile Parent { get; private set; }
         public List<SGAnimRotation> Rotations { get; private set; }
+        public List<SGAnimTransform2> Transformations { get; private set; }
         #endregion
 
         #region Constructor
         public SGSettings(SgbFile parent, byte[] buffer, int offset) {
             this.Parent = parent;
             this.Rotations = new List<SGAnimRotation>();
+            this.Transformations = new List<SGAnimTransform2>();
 
             this.Header = buffer.ToStructure<HeaderData>(offset);
             int animContainerOffset = offset + Header.AnimContainerOffset;
@@ -91,15 +151,42 @@ namespace SaintCoinach.Graphics.Sgb {
                 entryOffset += 12;
                 switch (type) {
                     case SGAnimType.Rotation:
-                        var anim = buffer.ToStructure<SGAnimRotation>(entryOffset);
-                        Rotations.Add(anim);
-                        if (parent.SGAnimRotationTargetMap.ContainsKey(anim.TargetSGEntryID)) {
-                            parent.SGAnimRotationTargetMap[anim.TargetSGEntryID].Add(anim);
+                        {
+                            var anim = buffer.ToStructure<SGAnimRotation>(entryOffset);
+                            Rotations.Add(anim);
+                            if (parent.SGAnimRotationTargetMap.ContainsKey(anim.TargetSGEntryID))
+                                parent.SGAnimRotationTargetMap[anim.TargetSGEntryID].Add(anim);
+                            else 
+                                parent.SGAnimRotationTargetMap.Add(anim.TargetSGEntryID, new List<SGAnimRotation>() { anim });
                         }
-                        else {
-                            parent.SGAnimRotationTargetMap.Add(anim.TargetSGEntryID, new List<SGAnimRotation>() { anim });
-                        }
+                        break;
+                    case SGAnimType.Transform:
+                        {
+                            var anim = buffer.ToStructure<SGAnimTransform>(entryOffset);
+                            SGAnimTransform2 anim2 = new SGAnimTransform2 { TargetSGMemberIDs = new uint[anim.TargetSGMemberIDCount], Loop = anim.Loop };
+                            anim2.Translation = buffer.ToStructure<Vector3>((entryOffset - 12) + anim.Translation);
+                            anim2.Rotation = buffer.ToStructure<Vector3>((entryOffset - 12) + anim.Rotation);
+                            anim2.Scale = buffer.ToStructure<Vector3>((entryOffset - 12) + anim.Scale);
 
+                            anim2.Enabled = anim.ItemTransform.Enabled;
+                            anim2.Offset = anim.ItemTransform.Offset;
+                            anim2.CurveType = anim.ItemTransform.CurveType;
+                            anim2.MovementType = anim.ItemTransform.MovementType;
+                            anim2.Time = anim.ItemTransform.Time;
+                            anim2.StartEndTime = anim.ItemTransform.StartEndTime;
+                            anim2.RandomRate = anim.ItemTransform.RandomRate;
+                            
+                            for(var j = 0; j < anim.TargetSGMemberIDCount; ++j) {
+                                byte currTargetSg = buffer.ToStructure<byte>((entryOffset - 16) + anim.TargetSGMemberIDs + j);
+
+                                if (parent.SGAnimTransformationTargetMap.ContainsKey(currTargetSg))
+                                    parent.SGAnimTransformationTargetMap[currTargetSg].Add(anim2);
+                                else
+                                    parent.SGAnimTransformationTargetMap.Add(currTargetSg, new List<SGAnimTransform2>() { anim2 });
+
+                            }
+                            Transformations.Add(anim2);
+                        }
                         break;
                     default:
                         System.Diagnostics.Debug.WriteLine($"SGAnimType {type.ToString()} not implemented!");

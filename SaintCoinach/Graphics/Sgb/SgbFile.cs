@@ -44,7 +44,8 @@ namespace SaintCoinach.Graphics.Sgb {
         public HeaderData Header { get; private set; }
         public SGSettings SGSettings { get; private set; }
 
-        public Dictionary<uint, List<SGSettings.SGAnimRotation>> SGAnimRotationTargetMap;
+        public Dictionary<uint, List<SGSettings.SGAnimRotation>> SGAnimRotationTargetMap { get; private set; }
+        public Dictionary<uint, List<SGSettings.SGAnimTransform2>> SGAnimTransformationTargetMap { get; private set; }
         public IO.File File { get; private set; }
         public ISgbData[] Data { get; private set; }
         #endregion
@@ -65,6 +66,7 @@ namespace SaintCoinach.Graphics.Sgb {
             
             this.Header = buffer.ToStructure<HeaderData>(0);
             this.SGAnimRotationTargetMap = new Dictionary<uint, List<SGSettings.SGAnimRotation>>();
+            this.SGAnimTransformationTargetMap = new Dictionary<uint, List<SGSettings.SGAnimTransform2>>();
 
             if (Header.Magic1 != 0x31424753 || Header.Magic2 != 0x314E4353)     // LGB1 & SCN1
                 throw new System.IO.InvalidDataException();
