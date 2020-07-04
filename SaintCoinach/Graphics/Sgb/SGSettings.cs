@@ -210,6 +210,7 @@ namespace SaintCoinach.Graphics.Sgb {
                             for(var j = 0; j < anim.TargetSGMemberIDCount; ++j) {
                                 byte currTargetSg = buffer.ToStructure<byte>((entryOffset - 16) + anim.TargetSGMemberIDs + j);
 
+                                anim2.TargetSGMemberIDs[j] = currTargetSg;
                                 if (parent.SGAnimTransformationTargetMap.ContainsKey(currTargetSg))
                                     parent.SGAnimTransformationTargetMap[currTargetSg].Add(anim2);
                                 else
