@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SaintCoinach.Graphics.Lgb;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SaintCoinach.Graphics.Sgb {
     public class SGSettings {
-        public enum SGAnimType : int {
+        public enum SGActionType : int {
             Unknown = 0x0,
             Door = 0x1,
             Rotation = 0x2,
@@ -24,6 +25,41 @@ namespace SaintCoinach.Graphics.Sgb {
             Y = 1,
             Z = 2
         }
+        public enum eSGActionColorCurveType {
+            SGActionColorCurveLinear = 0x0,
+            SGActionColorCurveSpline = 0x1,
+        };
+
+        public enum eSGActionColorBlinkType {
+            BlinkSineCurve = 0x0,
+            BlinkRandom = 0x1,
+        };
+
+        public enum eSGActionTransformCurveType {
+            CurveLinear = 0x0,
+            CurveSpline = 0x1,
+            CurveAcceleration = 0x2,
+            CurveDeceleration = 0x3,
+        };
+
+        public enum eSGActionTransformMovementType {
+            MovementOneWay = 0x0,
+            MovementRoundTrip = 0x1,
+            MovementRepetition = 0x2,
+        };
+
+        public enum eOpenStyle {
+            Rotation_0 = 0x0,
+            HorizontalSlide = 0x1,
+            VerticalSlide = 0x2,
+        };
+
+        public enum eCurveType {
+            Spline_0 = 0x1,
+            Linear = 0x2,
+            Acceleration1 = 0x3,
+            Deceleration1 = 0x4,
+        };
 
         #region Struct
         [StructLayout(LayoutKind.Sequential)]
@@ -51,7 +87,7 @@ namespace SaintCoinach.Graphics.Sgb {
         // todo:
         // cba with other shit, rotation only for now for aetherytes
         [StructLayout(LayoutKind.Sequential)]
-        public struct SGAnimRotation {
+        public struct SGActionRotation {
             public uint TargetSGEntryID;
             public SGRotationAxis Axis;
             public float FullRotationTime;
@@ -66,20 +102,7 @@ namespace SaintCoinach.Graphics.Sgb {
             public byte Padding;
         };
 
-        public enum eSGAnimTransformCurveType {
-            CurveLinear = 0x0,
-            CurveSpline = 0x1,
-            CurveAcceleration = 0x2,
-            CurveDeceleration = 0x3,
-        };
-
-        public enum eSGAnimTransformMovementType {
-            MovementOneWay = 0x0,
-            MovementRoundTrip = 0x1,
-            MovementRepetition = 0x2,
-        };
-
-        public struct SGAnimTransformItem {
+        public struct SGActionTransformItem {
             public byte Enabled;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
             public byte[] Padding00;
@@ -87,11 +110,11 @@ namespace SaintCoinach.Graphics.Sgb {
             public float RandomRate;
             public uint Time;
             public uint StartEndTime;
-            public eSGAnimTransformCurveType CurveType;
-            public eSGAnimTransformMovementType MovementType;
+            public eSGActionTransformCurveType CurveType;
+            public eSGActionTransformMovementType MovementType;
         };
 
-        public struct SGAnimTransform// : SGAction
+        public struct SGActionTransform// : SGAction
         {
             public int TargetSGMemberIDs;
             public int TargetSGMemberIDCount;
@@ -102,10 +125,10 @@ namespace SaintCoinach.Graphics.Sgb {
             public int Translation;
             public int Rotation;
             public int Scale;
-            public SGAnimTransformItem ItemTransform;
+            public SGActionTransformItem ItemTransform;
         };
 
-        public struct SGAnimTransform2
+        public struct SGActionTransform2
         {
             public uint[] TargetSGMemberIDs;
             public byte Loop;
@@ -118,24 +141,11 @@ namespace SaintCoinach.Graphics.Sgb {
             public float RandomRate;
             public uint Time;
             public uint StartEndTime;
-            public eSGAnimTransformCurveType CurveType;
-            public eSGAnimTransformMovementType MovementType;
+            public eSGActionTransformCurveType CurveType;
+            public eSGActionTransformMovementType MovementType;
         }
 
-        public enum eOpenStyle {
-            Rotation_0 = 0x0,
-            HorizontalSlide = 0x1,
-            VerticalSlide = 0x2,
-        };
-
-        public enum eCurveType {
-            Spline_0 = 0x1,
-            Linear = 0x2,
-            Acceleration1 = 0x3,
-            Deceleration1 = 0x4,
-        };
-
-        public struct SGAnimDoor {
+        public struct SGActionDoor {
             public byte DoorInstanceID1;
             public byte DoorInstanceID2;
             public short Padding01;
@@ -151,23 +161,62 @@ namespace SaintCoinach.Graphics.Sgb {
             public SGRotationAxis RotationAxis;
         };
 
+        public struct SGActionColorItem {
+            public byte Enabled;
+            public byte ColorEnabled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst =2)]
+            public byte[] Padding00;
+            public Lgb.ColorHDRI ColorStart;
+            public Lgb.ColorHDRI ColorEnd;
+            public byte PowerEnabled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] Padding01;
+            public float PowerStart;
+            public float PowerEnd;
+            public uint Time;
+            public eSGActionColorCurveType Curve;
+            public byte BlinkEnabled;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] Padding02;
+            public float BlinkAmplitude;
+            public float BlinkSpeed;
+            public eSGActionColorBlinkType BlinkType;
+            public byte BlinkSync;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] Padding03;
+        };
+
+        public struct SGActionColor// : SGAction
+        {
+            public int TargetSGMemberIDs;
+            public int TargetSGMemberIDCount;
+            public byte Loop;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] Padding01;
+            public uint Reserved2;
+            public int Emissive;
+            public int Light;
+            public SGActionColorItem ColorItem;
+        };
+
         #endregion
 
         #region Properties
         public HeaderData Header { get; private set; }
         public SgbFile Parent { get; private set; }
-        public List<SGAnimRotation> Rotations { get; private set; }
-        public List<SGAnimTransform2> Transformations { get; private set; }
-
-        public List<SGAnimDoor> Doors { get; private set; }
+        public List<SGActionRotation> Rotations { get; private set; }
+        public List<SGActionTransform2> Transformations { get; private set; }
+        public List<SGActionDoor> Doors { get; private set; }
+        public List<SGActionColor> ColourActions { get; private set; }
         #endregion
 
         #region Constructor
         public SGSettings(SgbFile parent, byte[] buffer, int offset) {
             this.Parent = parent;
-            this.Rotations = new List<SGAnimRotation>();
-            this.Transformations = new List<SGAnimTransform2>();
-            this.Doors = new List<SGAnimDoor>();
+            this.Rotations = new List<SGActionRotation>();
+            this.Transformations = new List<SGActionTransform2>();
+            this.Doors = new List<SGActionDoor>();
+            this.ColourActions = new List<SGActionColor>();
 
             this.Header = buffer.ToStructure<HeaderData>(offset);
             int animContainerOffset = offset + Header.AnimContainerOffset;
@@ -177,24 +226,24 @@ namespace SaintCoinach.Graphics.Sgb {
 
             for (int i = 0; i < entryCount; ++i) {
                 int entryOffset = animContainerOffset + buffer.ToStructure<int>(animContainerOffset + (i * 4));
-                SGAnimType type = (SGAnimType)buffer.ToStructure<int>(ref entryOffset);
+                SGActionType type = (SGActionType)buffer.ToStructure<int>(ref entryOffset);
                 // uint, uint, uint
                 entryOffset += 12;
                 switch (type) {
-                    case SGAnimType.Rotation:
+                    case SGActionType.Rotation:
                         {
-                            var anim = buffer.ToStructure<SGAnimRotation>(entryOffset);
+                            var anim = buffer.ToStructure<SGActionRotation>(entryOffset);
                             Rotations.Add(anim);
-                            if (parent.SGAnimRotationTargetMap.ContainsKey(anim.TargetSGEntryID))
-                                parent.SGAnimRotationTargetMap[anim.TargetSGEntryID].Add(anim);
+                            if (parent.SGActionRotationTargetMap.ContainsKey(anim.TargetSGEntryID))
+                                parent.SGActionRotationTargetMap[anim.TargetSGEntryID].Add(anim);
                             else 
-                                parent.SGAnimRotationTargetMap.Add(anim.TargetSGEntryID, new List<SGAnimRotation>() { anim });
+                                parent.SGActionRotationTargetMap.Add(anim.TargetSGEntryID, new List<SGActionRotation>() { anim });
                         }
                         break;
-                    case SGAnimType.Transform:
+                    case SGActionType.Transform:
                         {
-                            var anim = buffer.ToStructure<SGAnimTransform>(entryOffset);
-                            SGAnimTransform2 anim2 = new SGAnimTransform2 { TargetSGMemberIDs = new uint[anim.TargetSGMemberIDCount], Loop = anim.Loop };
+                            var anim = buffer.ToStructure<SGActionTransform>(entryOffset);
+                            SGActionTransform2 anim2 = new SGActionTransform2 { TargetSGMemberIDs = new uint[anim.TargetSGMemberIDCount], Loop = anim.Loop };
                             anim2.Translation = buffer.ToStructure<Vector3>((entryOffset - 12) + anim.Translation);
                             anim2.Rotation = buffer.ToStructure<Vector3>((entryOffset - 12) + anim.Rotation);
                             anim2.Scale = buffer.ToStructure<Vector3>((entryOffset - 12) + anim.Scale);
@@ -211,50 +260,58 @@ namespace SaintCoinach.Graphics.Sgb {
                                 byte currTargetSg = buffer.ToStructure<byte>((entryOffset - 16) + anim.TargetSGMemberIDs + j);
 
                                 anim2.TargetSGMemberIDs[j] = currTargetSg;
-                                if (parent.SGAnimTransformationTargetMap.ContainsKey(currTargetSg))
-                                    parent.SGAnimTransformationTargetMap[currTargetSg].Add(anim2);
+                                if (parent.SGActionTransformationTargetMap.ContainsKey(currTargetSg))
+                                    parent.SGActionTransformationTargetMap[currTargetSg].Add(anim2);
                                 else
-                                    parent.SGAnimTransformationTargetMap.Add(currTargetSg, new List<SGAnimTransform2>() { anim2 });
+                                    parent.SGActionTransformationTargetMap.Add(currTargetSg, new List<SGActionTransform2>() { anim2 });
 
                             }
                             Transformations.Add(anim2);
                         }
                         break;
-                    case SGAnimType.Door:
+                    case SGActionType.Door:
                         {
-                            var anim = buffer.ToStructure<SGAnimDoor>(entryOffset);
+                            var anim = buffer.ToStructure<SGActionDoor>(entryOffset);
                             Doors.Add(anim);
 
-                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID1))
-                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID1].Add(anim);
+                            if (parent.SGActionDoorTargetMap.ContainsKey(anim.DoorInstanceID1))
+                                parent.SGActionDoorTargetMap[anim.DoorInstanceID1].Add(anim);
                             else
-                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID1, new List<SGAnimDoor>() { anim });
+                                parent.SGActionDoorTargetMap.Add(anim.DoorInstanceID1, new List<SGActionDoor>() { anim });
 
 
-                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID2))
-                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID2].Add(anim);
+                            if (parent.SGActionDoorTargetMap.ContainsKey(anim.DoorInstanceID2))
+                                parent.SGActionDoorTargetMap[anim.DoorInstanceID2].Add(anim);
                             else
-                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID2, new List<SGAnimDoor>() { anim });
+                                parent.SGActionDoorTargetMap.Add(anim.DoorInstanceID2, new List<SGActionDoor>() { anim });
 
-                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID3))
-                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID3].Add(anim);
+                            if (parent.SGActionDoorTargetMap.ContainsKey(anim.DoorInstanceID3))
+                                parent.SGActionDoorTargetMap[anim.DoorInstanceID3].Add(anim);
                             else
-                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID3, new List<SGAnimDoor>() { anim });
+                                parent.SGActionDoorTargetMap.Add(anim.DoorInstanceID3, new List<SGActionDoor>() { anim });
 
-                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID3))
-                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID3].Add(anim);
+                            if (parent.SGActionDoorTargetMap.ContainsKey(anim.DoorInstanceID3))
+                                parent.SGActionDoorTargetMap[anim.DoorInstanceID3].Add(anim);
                             else
-                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID3, new List<SGAnimDoor>() { anim });
+                                parent.SGActionDoorTargetMap.Add(anim.DoorInstanceID3, new List<SGActionDoor>() { anim });
 
 
-                            if (parent.SGAnimDoorTargetMap.ContainsKey(anim.DoorInstanceID4))
-                                parent.SGAnimDoorTargetMap[anim.DoorInstanceID4].Add(anim);
+                            if (parent.SGActionDoorTargetMap.ContainsKey(anim.DoorInstanceID4))
+                                parent.SGActionDoorTargetMap[anim.DoorInstanceID4].Add(anim);
                             else
-                                parent.SGAnimDoorTargetMap.Add(anim.DoorInstanceID4, new List<SGAnimDoor>() { anim });
+                                parent.SGActionDoorTargetMap.Add(anim.DoorInstanceID4, new List<SGActionDoor>() { anim });
+                        }
+                        break;
+                    case SGActionType.Colour:
+                        {
+                            var anim = buffer.ToStructure<SGActionColor>(entryOffset);
+                            ColourActions.Add(anim);
+
+                            
                         }
                         break;
                     default:
-                        System.Diagnostics.Debug.WriteLine($"SGAnimType {type.ToString()} not implemented!");
+                        System.Diagnostics.Debug.WriteLine($"SGActionType {type.ToString()} not implemented!");
                         break;
                 }
             }

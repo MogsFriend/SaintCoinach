@@ -12,7 +12,7 @@ namespace SaintCoinach.Graphics.Lgb {
         [StructLayout(LayoutKind.Sequential)]
         public struct HeaderData {
             public LgbEntryType Type;
-            public uint Unknown2;
+            public uint Id;
             public int NameOffset;
             public Vector3 Translation;
             public Vector3 Rotation;
@@ -36,6 +36,8 @@ namespace SaintCoinach.Graphics.Lgb {
         public string CollisionFilePath { get; private set; }
         public TransformedModel Model { get; private set; }
         public Pcb.PcbFile CollisionFile { get; private set; }
+
+        public bool IsEmissive { get; set; }
         #endregion
 
         #region Constructor

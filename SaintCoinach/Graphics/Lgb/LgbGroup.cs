@@ -11,26 +11,25 @@ namespace SaintCoinach.Graphics.Lgb {
         #region Struct
         [StructLayout(LayoutKind.Sequential)]
         public struct HeaderData {
-            public uint Unknown1;
-            public int GroupNameOffset;
-            public int EntriesOffset;
-            public int EntryCount;
-            public uint Unknown2;
-            public uint Unknown3;
-            public uint FestivalId;
-            public uint Unknown5;
-            // Just a guess -
-            // This number corresponds to the last digits of Map.Id.  In
-            // territories with rotated subdivisions, it can be used to select
-            // the appropriate map for coordinate calculation.
-            // Possibly 3-4 bytes to match the first three columns in the Map
-            // exd.
-            public uint MapIndex;
-            public uint Unknown7;
-            public uint Unknown8;
-            public uint Unknown9;
-            public uint Unknown10;
-            public uint Unknown11;
+            public uint LayerID;
+            public int Name;
+            public int InstanceObjects;
+            public int InstanceObjectCount;
+            public byte ToolModeVisible;
+            public byte ToolModeReadOnly;
+            public byte IsBushLayer;
+            public byte PS3Visible;
+            public int LayerSetRef;
+            public ushort FestivalID;
+            public ushort FestivalPhaseID;
+            public byte IsTemporary;
+            public byte IsHousing;
+            public ushort VersionMask;
+            public uint Reserved;
+            public int OBSetReferencedList;
+            public int OBSetReferencedListCount;
+            public int OBSetEnableReferencedList;
+            public int OBSetEnableReferencedListCount;
         }
         #endregion
 
@@ -39,21 +38,23 @@ namespace SaintCoinach.Graphics.Lgb {
         public HeaderData Header { get; private set; }
         public string Name { get; private set; }
         public ILgbEntry[] Entries { get; private set; }
+        public Sgb.SgbGroup.ObjectBehaviour[] ObjectBehaviours { get; private set; }
+
         #endregion
 
         #region Constructor
         public LgbGroup(LgbFile parent, byte[] buffer, int offset) {
             this.Parent = parent;
             this.Header = buffer.ToStructure<HeaderData>(offset);
-            this.Name = buffer.ReadString(offset + Header.GroupNameOffset);
+            this.Name = buffer.ReadString(offset + Header.Name);
 
             //uint[] Unknown = new uint[100];
             //System.Buffer.BlockCopy(buffer, offset + System.Runtime.InteropServices.Marshal.SizeOf<HeaderData>(), Unknown, 0, 400);
 
             
-            var entriesOffset = offset + Header.EntriesOffset;
-            Entries = new ILgbEntry[Header.EntryCount];
-            for(var i = 0; i < Header.EntryCount; ++i) {
+            var entriesOffset = offset + Header.InstanceObjects;
+            Entries = new ILgbEntry[Header.InstanceObjectCount];
+            for(var i = 0; i < Header.InstanceObjectCount; ++i) {
                 var entryOffset = entriesOffset + BitConverter.ToInt32(buffer, entriesOffset + i * 4);
                 var type = (LgbEntryType)BitConverter.ToInt32(buffer, entryOffset);
 
@@ -93,7 +94,18 @@ namespace SaintCoinach.Graphics.Lgb {
                     Debug.WriteLine($"{Parent.File.Path} {type} at 0x{entryOffset:X} in {Name} failure: {ex.Message}");
                 }
             }
-
+            this.ObjectBehaviours = new Sgb.SgbGroup.ObjectBehaviour[Header.OBSetEnableReferencedListCount];
+            var structSize = Marshal.SizeOf(new Sgb.SgbGroup.ObjectBehaviour());
+            for (var i = 0; i < this.ObjectBehaviours.Length; ++i) {
+                // offset + fileHdr + obsetOffset + obsetEntryOffset
+                this.ObjectBehaviours[i] = buffer.ToStructure<Sgb.SgbGroup.ObjectBehaviour>(offset + (int)Header.OBSetEnableReferencedList + (i * structSize));
+                foreach (var mdl in this.Entries.OfType<LgbModelEntry>()) {
+                    if (mdl.Header.Id == ObjectBehaviours[i].InstanceId) {
+                        mdl.IsEmissive = ObjectBehaviours[i].Emissive == 1 ? true : false;
+                        break;
+                    }
+                }
+            }
         }
         #endregion
 

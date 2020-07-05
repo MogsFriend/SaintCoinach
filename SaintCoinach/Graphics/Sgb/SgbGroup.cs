@@ -20,18 +20,22 @@ namespace SaintCoinach.Graphics.Sgb {
             public uint Unknown18;
             public uint Unknown1C;
 
-            public int EntryCount;
-            public uint Unknown24;
-            public uint Unknown28;
-            public uint Unknown2C;
-
-            public uint Unknown30;
-            public uint Unknown34;
-            public uint Unknown38;
-            public uint Unknown3C;
-
-            public uint ObjectBehaviourOffset;
-            public uint ObjectBehaviourCount;
+            public int EntryCount; // InstanceObjectsCount
+            public byte ToolModeVisible;
+            public byte ToolModeReadOnly;
+            public byte IsBushLayer;
+            public byte PS3Visible;
+            public int LayerSetRef;
+            public ushort FestivalID;
+            public ushort FestivalPhaseID;
+            public byte IsTemporary;
+            public byte IsHousing;
+            public ushort VersionMask;
+            public uint Reserved;
+            public int OBSetReferencedList;
+            public int OBSetReferencedListCount;
+            public int OBSetEnableReferencedList;
+            public int OBSetEnableReferencedListCount;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -141,11 +145,11 @@ namespace SaintCoinach.Graphics.Sgb {
                         System.Diagnostics.Debug.WriteLine(e.Message);
                     }
                 }
-                this.ObjectBehaviours = new ObjectBehaviour[Header.ObjectBehaviourCount];
+                this.ObjectBehaviours = new ObjectBehaviour[Header.OBSetEnableReferencedListCount];
                 var structSize = Marshal.SizeOf(new ObjectBehaviour());
                 for (var i = 0; i < this.ObjectBehaviours.Length; ++i) {
                     // offset + fileHdr + obsetOffset + obsetEntryOffset
-                    this.ObjectBehaviours[i] = buffer.ToStructure<ObjectBehaviour>(offset + 20 + (int)Header.ObjectBehaviourOffset + (i * structSize));
+                    this.ObjectBehaviours[i] = buffer.ToStructure<ObjectBehaviour>(entriesOffset + (int)Header.OBSetEnableReferencedList + (i * structSize));
                     foreach (var mdl in this.Entries.OfType<SgbModelEntry>()) {
                         if (mdl.Header.GimmickId == ObjectBehaviours[i].InstanceId) {
                             mdl.IsEmissive = ObjectBehaviours[i].Emissive == 1 ? true : false;
