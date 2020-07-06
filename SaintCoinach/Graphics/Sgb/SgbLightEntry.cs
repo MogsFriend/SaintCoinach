@@ -48,15 +48,16 @@ namespace SaintCoinach.Graphics.Sgb {
         public HeaderData Header { get; private set; }
         public string Name { get; private set; }
         public string TexturePath { get; private set; }
-        public Sgb.SgbFile Gimmick { get; private set; }
+        public Sgb.SgbFile Parent { get; private set; }
         #endregion
 
         #region Constructor
-        public SgbLightEntry(IO.PackCollection packs, byte[] buffer, int offset) {
+        public SgbLightEntry(SgbFile parent, byte[] buffer, int offset) {
             this.Header = buffer.ToStructure<HeaderData>(offset);
             this.Name = buffer.ReadString(offset + Header.NameOffset);
             this.TexturePath = buffer.ReadString(offset + Header.TexturePath);
 
+            this.Parent = parent;
             int x = 0;
         }
         #endregion

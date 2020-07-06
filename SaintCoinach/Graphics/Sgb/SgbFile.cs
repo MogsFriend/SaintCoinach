@@ -76,13 +76,13 @@ namespace SaintCoinach.Graphics.Sgb {
             var data = new List<ISgbData>();
 
             try {
-                data.Add(new SgbGroup(this, buffer, BaseOffset + Header.SharedOffset));
                 this.SGSettings = new SGSettings(this, buffer, BaseOffset + Header.SGSettingsOffset);
+                data.Add(new SgbGroup(this, buffer, BaseOffset + Header.SharedOffset));
                 //data.Add(new SgbGroup(this, buffer, BaseOffset + Header.Settings, true));
                 //data.Add(new SgbGroup(this, buffer, BaseOffset + Header.Unknown1));
             }
             catch (Exception ex) {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
+                System.Diagnostics.Debug.WriteLine("SGB ERROR:" + ex.Message);
             }
 
             this.Data = data.ToArray();

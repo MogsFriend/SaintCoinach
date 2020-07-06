@@ -127,7 +127,7 @@ namespace SaintCoinach.Graphics.Sgb {
                                 Entries[i] = new SgbGimmickEntry(Parent.File.Pack.Collection, buffer, entryOffset);
                                 break;
                             case SgbGroupEntryType.Light:
-                                Entries[i] = new SgbLightEntry(Parent.File.Pack.Collection, buffer, entryOffset);
+                                Entries[i] = new SgbLightEntry(Parent, buffer, entryOffset);
                                 break;
                             case SgbGroupEntryType.Vfx:
                                 Entries[i] = new SgbVfxEntry(Parent.File.Pack.Collection, buffer, entryOffset);
