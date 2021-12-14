@@ -1,0 +1,16 @@
+{
+  "sheet": "ExportedGatheringPoint",
+  "definitions": [
+    {
+      "name": "X"
+    },
+    {
+      "index": 1,
+      "name": "Y"
+    },
+    {
+      "index": 2,
+      "name": "Radius"
+    }
+  ]
+}

@@ -37,7 +37,31 @@
       }
     },
     {
+      "index": 6,
+      "name": "StartCutscene",
+      "converter": {
+        "type": "link",
+        "target": "PublicContentCutscene"
+      }
+    },
+    {
+      "index": 7,
+      "name": "LGBEventRange"
+    },
+    {
       "index": 8,
+      "name": "LGBPopRange"
+    },
+    {
+      "index": 16,
+      "name": "EndCutscene",
+      "converter": {
+        "type": "link",
+        "target": "PublicContentCutscene"
+      }
+    },
+    {
+      "index": 9,
       "name": "ContentFinderCondition",
       "converter": {
         "type": "link",
@@ -45,7 +69,7 @@
       }
     },
     {
-      "index": 9,
+      "index": 10,
       "name": "AdditionalData",
       "converter": {
         "type": "complexlink",

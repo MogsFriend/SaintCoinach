@@ -1,3 +1,6 @@
+# **THIS REPOSITORY HAS BEEN MOVED TO https://github.com/xivapi/SaintCoinach. NO NEW RELEASES WILL BE PUSHED TO THIS REPOSITORY** 
+
+
 # Saint Coinach
 
 A .NET library written in C# for extracting game assets and reading game assets from **Final Fantasy XIV**, now with support for including the Libra Eorzea database.
@@ -104,7 +107,7 @@ Godbert is a simple application to display game data and 3D models from **Final 
 ## Functionality 
 ### Fully implemented
 
-* Display of game data / text.
+* Display of game data/text.
 * Rendering of equipment, including ability to dye (if the item supports it.)
 * Rendering of monsters.
 * Rendering of demi-humans (non-playable races with exchangable equipment.)

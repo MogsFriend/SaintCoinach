@@ -107,14 +107,6 @@
       }
     },
     {
-      "index": 1261,
-      "type": "repeat",
-      "count": 60,
-      "definition": {
-        "name": "Unknown"
-      }
-    },
-    {
       "index": 1321,
       "type": "repeat",
       "count": 60,
@@ -127,24 +119,7 @@
       }
     },
     {
-      "index": 1381,
-      "type": "repeat",
-      "count": 2,
-      "definition": {
-        "type": "group",
-        "members": [
-          {
-            "type": "repeat",
-            "count": 60,
-            "definition": {
-              "name": "Unknown"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "index": 1801,
+      "index": 1441,
       "type": "repeat",
       "count": 60,
       "definition": {
@@ -152,7 +127,11 @@
       }
     },
     {
-      "index": 1862,
+      "index": 1501,
+      "name": "UseCurrencyType"
+    },
+    {
+      "index": 1502,
       "name": "Quest{Unlock}",
       "converter": {
         "type": "link",
@@ -160,16 +139,16 @@
       }
     },
     {
-      "index": 1863,
-      "name": "NotCompleteText",
+      "index": 1503,
+      "name": "CompleteText",
       "converter": {
         "type": "link",
         "target": "DefaultTalk"
       }
     },
     {
-      "index": 1864,
-      "name": "CompleteText",
+      "index": 1504,
+      "name": "NotCompleteText",
       "converter": {
         "type": "link",
         "target": "DefaultTalk"

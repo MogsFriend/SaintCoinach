@@ -91,6 +91,10 @@
       }
     },
     {
+      "index": 16,
+      "name": "Header"
+    },
+    {
       "index": 19,
       "name": "ClassJob{Unlock}",
       "converter": {
@@ -139,6 +143,14 @@
       }
     },
     {
+      "index": 27,
+      "name": "FestivalBegin"
+    },
+    {
+      "index": 28,
+      "name": "FestivalEnd"
+    },
+    {
       "index": 29,
       "name": "Bell{Start}"
     },
@@ -164,7 +176,7 @@
     },
     {
       "index": 33,
-      "name": "Level{Max}"
+      "name": "BeastReputationValue"
     },
     {
       "index": 36,
@@ -199,7 +211,15 @@
     },
     {
       "index": 40,
-      "name": "Behavior",
+      "name": "Issuer{Location}",
+      "converter": {
+        "type": "link",
+        "target": "Level"
+      }
+    },
+    {
+      "index": 41,
+      "name": "ClientBehavior",
       "converter": {
         "type": "link",
         "target": "Behavior"
@@ -234,14 +254,14 @@
     },
     {
       "index": 46,
-      "name": "UnlocksSystemContent"
+      "name": "CanCancel"
     },
     {
-      "index": 48,
+      "index": 47,
       "name": "Type"
     },
     {
-      "index": 49,
+      "index": 48,
       "name": "QuestClassJobSupply",
       "converter": {
         "type": "link",
@@ -249,7 +269,7 @@
       }
     },
     {
-      "index": 50,
+      "index": 49,
       "type": "repeat",
       "count": 50,
       "definition": {
@@ -257,7 +277,7 @@
       }
     },
     {
-      "index": 100,
+      "index": 99,
       "type": "repeat",
       "count": 50,
       "definition": {
@@ -265,7 +285,7 @@
       }
     },
     {
-      "index": 150,
+      "index": 149,
       "type": "repeat",
       "count": 64,
       "definition": {
@@ -273,7 +293,7 @@
       }
     },
     {
-      "index": 214,
+      "index": 213,
       "type": "repeat",
       "count": 64,
       "definition": {
@@ -281,24 +301,15 @@
       }
     },
     {
-      "index": 278,
+      "index": 277,
       "type": "repeat",
       "count": 64,
       "definition": {
-        "name": "ActorSpawn",
-        "converter": {
-          "type": "multiref",
-          "targets": [
-            "EObjName",
-            "ENpcResident",
-            "ENpcBase",
-            "BNpcName"
-          ]
-        }
+        "name": "Listener"
       }
     },
     {
-      "index": 342,
+      "index": 341,
       "type": "repeat",
       "count": 32,
       "definition": {
@@ -306,7 +317,7 @@
       }
     },
     {
-      "index": 374,
+      "index": 373,
       "type": "repeat",
       "count": 32,
       "definition": {
@@ -314,7 +325,103 @@
       }
     },
     {
-      "index": 1174,
+      "index": 405,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "ConditionType"
+      }
+    },
+    {
+      "index": 469,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "ConditionValue"
+      }
+    },
+    {
+      "index": 533,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "ConditionOperator"
+      }
+    },
+    {
+      "index": 597,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "Behavior"
+      }
+    },
+    {
+      "index": 661,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "VisibleBool"
+      }
+    },
+    {
+      "index": 725,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "ConditionBool"
+      }
+    },
+    {
+      "index": 789,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "ItemBool"
+      }
+    },
+    {
+      "index": 853,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "AnnounceBool"
+      }
+    },
+    {
+      "index": 917,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "BehaviorBool"
+      }
+    },
+    {
+      "index": 981,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "AcceptBool"
+      }
+    },
+    {
+      "index": 1045,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "QualifiedBool"
+      }
+    },
+    {
+      "index": 1109,
+      "type": "repeat",
+      "count": 64,
+      "definition": {
+        "name": "CanTargetBool"
+      }
+    },
+    {
+      "index": 1173,
       "type": "repeat",
       "count": 24,
       "definition": {
@@ -322,7 +429,7 @@
       }
     },
     {
-      "index": 1198,
+      "index": 1197,
       "type": "repeat",
       "count": 24,
       "definition": {
@@ -330,7 +437,7 @@
       }
     },
     {
-      "index": 1222,
+      "index": 1221,
       "type": "repeat",
       "count": 24,
       "definition": {
@@ -342,7 +449,7 @@
       }
     },
     {
-      "index": 1246,
+      "index": 1245,
       "type": "repeat",
       "count": 7,
       "definition": {
@@ -358,7 +465,19 @@
       }
     },
     {
-      "index": 1439,
+      "index": 1413,
+      "type": "repeat",
+      "count": 24,
+      "definition": {
+        "name": "CountableNum"
+      }
+    },
+    {
+      "index": 1437,
+      "name": "Level{Max}"
+    },
+    {
+      "index": 1438,
       "name": "ClassJob{Required}",
       "converter": {
         "type": "link",
@@ -366,19 +485,19 @@
       }
     },
     {
-      "index": 1441,
+      "index": 1440,
       "name": "ExpFactor"
     },
     {
-      "index": 1442,
+      "index": 1441,
       "name": "GilReward"
     },
     {
-      "index": 1444,
+      "index": 1443,
       "name": "GCSeals"
     },
     {
-      "index": 1445,
+      "index": 1444,
       "type": "repeat",
       "count": 3,
       "definition": {
@@ -390,7 +509,7 @@
       }
     },
     {
-      "index": 1448,
+      "index": 1447,
       "type": "repeat",
       "count": 3,
       "definition": {
@@ -398,13 +517,13 @@
       }
     },
     {
-      "index": 1451,
+      "index": 1450,
       "name": "ItemRewardType"
     },
     {
-      "index": 1452,
+      "index": 1451,
       "type": "repeat",
-      "count": 6,
+      "count": 7,
       "definition": {
         "name": "Item{Reward}[0]",
         "converter": {
@@ -425,7 +544,7 @@
       }
     },
     {
-      "index": 1459,
+      "index": 1458,
       "type": "repeat",
       "count": 6,
       "definition": {
@@ -433,7 +552,7 @@
       }
     },
     {
-      "index": 1466,
+      "index": 1465,
       "type": "repeat",
       "count": 6,
       "definition": {
@@ -445,7 +564,7 @@
       }
     },
     {
-      "index": 1473,
+      "index": 1472,
       "type": "repeat",
       "count": 5,
       "definition": {
@@ -457,7 +576,7 @@
       }
     },
     {
-      "index": 1478,
+      "index": 1477,
       "type": "repeat",
       "count": 5,
       "definition": {
@@ -465,7 +584,7 @@
       }
     },
     {
-      "index": 1483,
+      "index": 1482,
       "type": "repeat",
       "count": 5,
       "definition": {
@@ -473,7 +592,7 @@
       }
     },
     {
-      "index": 1488,
+      "index": 1487,
       "type": "repeat",
       "count": 5,
       "definition": {
@@ -485,7 +604,7 @@
       }
     },
     {
-      "index": 1493,
+      "index": 1492,
       "name": "Emote{Reward}",
       "converter": {
         "type": "link",
@@ -493,7 +612,7 @@
       }
     },
     {
-      "index": 1494,
+      "index": 1493,
       "name": "Action{Reward}",
       "converter": {
         "type": "link",
@@ -501,7 +620,7 @@
       }
     },
     {
-      "index": 1495,
+      "index": 1494,
       "type": "repeat",
       "count": 2,
       "definition": {
@@ -513,7 +632,15 @@
       }
     },
     {
-      "index": 1498,
+      "index": 1496,
+      "name": "System{Reward}[0]",
+      "converter": {
+        "type": "link",
+        "target": "Action"
+      }
+    },
+    {
+      "index": 1497,
       "name": "Other{Reward}",
       "converter": {
         "type": "link",
@@ -521,7 +648,23 @@
       }
     },
     {
-      "index": 1501,
+      "index": 1498,
+      "name": "System{Reward}[1]",
+      "converter": {
+        "type": "link",
+        "target": "Action"
+      }
+    },
+    {
+      "index": 1499,
+      "name": "GCType{Reward}",
+      "converter": {
+        "type": "link",
+        "target": "Action"
+      }
+    },
+    {
+      "index": 1500,
       "name": "InstanceContent{Unlock}",
       "converter": {
         "type": "link",
@@ -529,7 +672,7 @@
       }
     },
     {
-      "index": 1503,
+      "index": 1502,
       "name": "Tomestone{Reward}",
       "converter": {
         "type": "complexlink",
@@ -543,15 +686,15 @@
       }
     },
     {
-      "index": 1504,
+      "index": 1503,
       "name": "TomestoneCount{Reward}"
     },
     {
-      "index": 1505,
+      "index": 1504,
       "name": "ReputationReward"
     },
     {
-      "index": 1506,
+      "index": 1505,
       "name": "PlaceName",
       "converter": {
         "type": "link",
@@ -559,7 +702,7 @@
       }
     },
     {
-      "index": 1507,
+      "index": 1506,
       "name": "JournalGenre",
       "converter": {
         "type": "link",
@@ -567,21 +710,29 @@
       }
     },
     {
-      "index": 1509,
+      "index": 1508,
       "name": "Icon",
       "converter": {
         "type": "icon"
       }
     },
     {
-      "index": 1510,
+      "index": 1509,
       "name": "Icon{Special}",
       "converter": {
         "type": "icon"
       }
     },
     {
-      "index": 1513,
+      "index": 1510,
+      "name": "Introduction"
+    },
+    {
+      "index": 1511,
+      "name": "HideOfferIcon"
+    },
+    {
+      "index": 1512,
       "name": "EventIconType",
       "converter": {
         "type": "link",
@@ -589,7 +740,7 @@
       }
     },
     {
-      "index": 1515,
+      "index": 1514,
       "name": "SortKey"
     }
   ]

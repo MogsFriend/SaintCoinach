@@ -19,10 +19,18 @@
     },
     {
       "index": 3,
+      "name": "AchievementTarget",
+      "converter": {
+        "type": "link",
+        "target": "AchievementTarget"
+      }
+    },
+    {
+      "index": 5,
       "name": "Points"
     },
     {
-      "index": 4,
+      "index": 6,
       "name": "Title",
       "converter": {
         "type": "link",
@@ -30,7 +38,7 @@
       }
     },
     {
-      "index": 5,
+      "index": 7,
       "name": "Item",
       "converter": {
         "type": "link",
@@ -38,18 +46,18 @@
       }
     },
     {
-      "index": 6,
+      "index": 11,
       "name": "Icon",
       "converter": {
         "type": "icon"
       }
     },
     {
-      "index": 8,
+      "index": 13,
       "name": "Type"
     },
     {
-      "index": 9,
+      "index": 14,
       "name": "Key",
       "converter": {
         "type": "complexlink",
@@ -137,19 +145,12 @@
               "value": 24
             },
             "sheet": "Quest"
-          },
-          {
-            "when": {
-              "key": "Type",
-              "value": 24
-            },
-            "sheet": "ClassJob"
           }
         ]
       }
     },
     {
-      "index": 10,
+      "index": 15,
       "type": "repeat",
       "count": 8,
       "definition": {
@@ -197,25 +198,21 @@
                 "key": "Type",
                 "value": 24
               },
-              "sheet": "Quest"
-            },
-            {
-              "when": {
-                "key": "Type",
-                "value": 24
-              },
-              "sheet": "ClassJob"
+              "sheets": [
+                "ClassJob",
+                "Quest"
+              ]
             }
           ]
         }
       }
     },
     {
-      "index": 18,
+      "index": 23,
       "name": "Order"
     },
     {
-      "index": 20,
+      "index": 25,
       "name": "AchievementHideCondition",
       "converter": {
         "type": "link",

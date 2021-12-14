@@ -14,8 +14,16 @@
       }
     },
     {
+      "index": 2,
+      "name": "ShowComplete"
+    },
+    {
       "index": 3,
       "name": "HideCategory"
+    },
+    {
+      "index": 4,
+      "name": "Order"
     }
   ]
 }

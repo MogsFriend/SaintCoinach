@@ -22,8 +22,16 @@
       "name": "ExpArrayIndex"
     },
     {
+      "index": 5,
+      "name": "BattleClassIndex"
+    },
+    {
       "index": 7,
       "name": "JobIndex"
+    },
+    {
+      "index": 8,
+      "name": "DohDolJobIndex"
     },
     {
       "index": 9,
@@ -58,6 +66,10 @@
       "name": "Modifier{Piety}"
     },
     {
+      "index": 24,
+      "name": "PvPActionSortRow"
+    },
+    {
       "index": 26,
       "name": "ClassJob{Parent}",
       "converter": {
@@ -87,6 +99,14 @@
       "converter": {
         "type": "link",
         "target": "Town"
+      }
+    },
+    {
+      "index": 32,
+      "name": "MonsterNote",
+      "converter": {
+        "type": "link",
+        "target": "MonsterNote"
       }
     },
     {

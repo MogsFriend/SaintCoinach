@@ -4,7 +4,7 @@
     {
       "index": 1,
       "type": "repeat",
-      "count": 16,
+      "count": 32,
       "definition": {
         "name": "ItemAccepted",
         "converter": {
@@ -14,11 +14,27 @@
       }
     },
     {
-      "index": 17,
+      "index": 33,
       "type": "repeat",
-      "count": 16,
+      "count": 32,
       "definition": {
         "name": "AmountAccepted"
+      }
+    },
+    {
+      "index": 129,
+      "name": "Lua"
+    },
+    {
+      "index": 130,
+      "type": "repeat",
+      "count": 3,
+      "definition": {
+        "name": "LogMessage",
+        "converter": {
+          "type": "link",
+          "target": "LogMessage"
+        }
       }
     }
   ]

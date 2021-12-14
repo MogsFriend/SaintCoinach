@@ -18,6 +18,10 @@
       "name": "FishingSpotCategory"
     },
     {
+      "index": 4,
+      "name": "Rare"
+    },
+    {
       "index": 5,
       "name": "TerritoryType",
       "converter": {
@@ -27,18 +31,34 @@
     },
     {
       "index": 6,
-      "name": "X"
+      "name": "PlaceName{Main}",
+      "converter": {
+        "type": "link",
+        "target": "PlaceName"
+      }
     },
     {
       "index": 7,
-      "name": "Z"
+      "name": "PlaceName{Sub}",
+      "converter": {
+        "type": "link",
+        "target": "PlaceName"
+      }
     },
     {
       "index": 8,
-      "name": "Radius"
+      "name": "X"
+    },
+    {
+      "index": 9,
+      "name": "Z"
     },
     {
       "index": 10,
+      "name": "Radius"
+    },
+    {
+      "index": 12,
       "type": "repeat",
       "count": 10,
       "definition": {
@@ -50,7 +70,7 @@
       }
     },
     {
-      "index": 20,
+      "index": 22,
       "name": "PlaceName",
       "converter": {
         "type": "link",
@@ -58,7 +78,7 @@
       }
     },
     {
-      "index": 21,
+      "index": 23,
       "name": "Order"
     }
   ]

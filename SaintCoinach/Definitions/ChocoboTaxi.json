@@ -1,5 +1,6 @@
 {
   "sheet": "ChocoboTaxi",
+  "defaultColumn": "Location",
   "definitions": [
     {
       "name": "Location",
@@ -7,6 +8,14 @@
         "type": "link",
         "target": "ChocoboTaxiStand"
       }
+    },
+    {
+      "index": 1,
+      "name": "Fare"
+    },
+    {
+      "index": 2,
+      "name": "TimeRequired"
     }
   ]
 }

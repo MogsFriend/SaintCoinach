@@ -72,6 +72,14 @@
         "type": "link",
         "target": "Item"
       }
+    },
+    {
+      "index": 11,
+      "name": "ExPac",
+      "converter": {
+        "type": "link",
+        "target": "ExVersion"
+      }
     }
   ]
 }

@@ -3,11 +3,27 @@
   "defaultColumn": "Name",
   "definitions": [
     {
-      "name": "LogKind",
-      "converter": {
-        "type": "link",
-        "target": "LogKind"
-      }
+      "name": "LogKind"
+    },
+    {
+      "index": 1,
+      "name": "Caster"
+    },
+    {
+      "index": 2,
+      "name": "Target"
+    },
+    {
+      "index": 3,
+      "name": "Category"
+    },
+    {
+      "index": 4,
+      "name": "DisplayOrder"
+    },
+    {
+      "index": 5,
+      "name": "Preset"
     },
     {
       "index": 6,
