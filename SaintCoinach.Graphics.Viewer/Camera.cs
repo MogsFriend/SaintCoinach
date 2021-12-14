@@ -8,6 +8,7 @@ using Keys = System.Windows.Forms.Keys;
 
 namespace SaintCoinach.Graphics.Viewer {
     using SharpDX;
+    using System.Windows.Forms;
 
     public class Camera : IUpdateableComponent {
         #region Fields
@@ -170,7 +171,12 @@ namespace SaintCoinach.Graphics.Viewer {
                     _Yaw -= mouseMove.X * MouseRotationSpeedYaw;
                     _Pitch -= mouseMove.Y * MouseRotationSpeedPitch;
                 }
-
+                
+                if (_Engine.Keyboard.IsKeyDown(Keys.ControlKey) && _Engine.Keyboard.IsKeyDown(Keys.C)) {
+                    Vector3 rotatedVector = (Vector3)Vector3.Transform(new Vector3(0,0,-1), this.GetRotation());
+                    rotatedVector += CameraPosition;
+                    Clipboard.SetText($"/*camera pos*/ {{{CameraPosition.X}, {CameraPosition.Y}, {CameraPosition.Z}}}; /*facing*/{{{rotatedVector.X}, {rotatedVector.Y}, {rotatedVector.Z}}}");
+                }
                 AddToCameraPosition(moveVector * amount);
             }
 

@@ -127,6 +127,7 @@ namespace Godbert {
         }
         public void RunAsync() {
             var t = new Thread(this.Run);
+            t.SetApartmentState(ApartmentState.STA);
             t.IsBackground = true;
             t.Name = "Renderer";
             t.Start();

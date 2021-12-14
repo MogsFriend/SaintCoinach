@@ -113,8 +113,15 @@ namespace SaintCoinach.Graphics.Viewer {
         }
         protected override void Draw(EngineTime time) {
             Device.ImmediateContext.ClearRenderTargetView(RenderTargetView, Color.CornflowerBlue);
-            _Form.Text = _Title + ($" XYZ({Camera.CameraPosition.X}, {Camera.CameraPosition.Y}, {Camera.CameraPosition.Z}) R(P:{Camera.Pitch} Y:{Camera.Yaw})");
-            
+            var newTitle = ($" XYZ({Camera.CameraPosition.X}, {Camera.CameraPosition.Y}, {Camera.CameraPosition.Z}) R(P:{Camera.Pitch} Y:{Camera.Yaw})");
+            {
+                var rotation = Camera.GetRotation();
+
+                Vector3 rotatedVector = (Vector3)Vector3.Transform(new Vector3(0, 0, -1), rotation);
+                rotatedVector += Camera.CameraPosition;
+                newTitle += $" LOOK({rotatedVector.X}, {rotatedVector.Y}, {rotatedVector.Z})";
+            }
+            _Form.Text = _Title + newTitle;
             base.Draw(time);
         }
         protected override void Present() {
