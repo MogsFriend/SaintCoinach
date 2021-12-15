@@ -179,6 +179,18 @@
       "name": "BeastReputationValue"
     },
     {
+      "index": 34,
+      "name": "SatisfactionNpc",
+      "converter": {
+        "type": "link",
+        "target": "SatisfactionNpc"
+      }
+    },
+    {
+      "index": 35,
+      "name": "SatisfactionLevel"
+    },
+    {
       "index": 36,
       "name": "Mount{Required}",
       "converter": {
@@ -485,6 +497,14 @@
       }
     },
     {
+      "index": 1439,
+      "name": "QuestRewardOtherDisplay",
+      "converter": {
+        "type": "link",
+        "target": "QuestRewardOther"
+      }
+    },
+    {
       "index": 1440,
       "name": "ExpFactor"
     },
@@ -493,8 +513,16 @@
       "name": "GilReward"
     },
     {
+      "index": 1442,
+      "name": "CurrencyReward",
+      "converter": {
+        "type": "link",
+        "target": "Item"
+      }
+    },
+    {
       "index": 1443,
-      "name": "GCSeals"
+      "name": "CurrencyRewardCount"
     },
     {
       "index": 1444,
@@ -525,7 +553,7 @@
       "type": "repeat",
       "count": 7,
       "definition": {
-        "name": "Item{Reward}[0]",
+        "name": "Item{Reward}",
         "converter": {
           "type": "complexlink",
           "links": [
@@ -537,6 +565,13 @@
               "sheet": "QuestClassJobReward"
             },
             {
+              "when": {
+                "key": "ItemRewardType",
+                "value": 7
+              },
+              "sheet": "BeastRankBonus"
+            },
+            {
               "sheet": "Item"
             }
           ]
@@ -546,17 +581,17 @@
     {
       "index": 1458,
       "type": "repeat",
-      "count": 6,
+      "count": 7,
       "definition": {
-        "name": "ItemCount{Reward}[0]"
+        "name": "ItemCount{Reward}"
       }
     },
     {
-      "index": 1465,
+      "index": 1472,
       "type": "repeat",
-      "count": 6,
+      "count": 7,
       "definition": {
-        "name": "Stain{Reward}[0]",
+        "name": "Stain{Reward}",
         "converter": {
           "type": "link",
           "target": "Stain"
@@ -564,11 +599,11 @@
       }
     },
     {
-      "index": 1472,
+      "index": 1479,
       "type": "repeat",
       "count": 5,
       "definition": {
-        "name": "Item{Reward}[1]",
+        "name": "OptionalItem{Reward}",
         "converter": {
           "type": "link",
           "target": "Item"
@@ -576,27 +611,27 @@
       }
     },
     {
-      "index": 1477,
+      "index": 1484,
       "type": "repeat",
       "count": 5,
       "definition": {
-        "name": "ItemCount{Reward}[1]"
+        "name": "OptionalItemCount{Reward}"
       }
     },
     {
-      "index": 1482,
+      "index": 1489,
       "type": "repeat",
       "count": 5,
       "definition": {
-        "name": "IsHQ{Reward}[1]"
+        "name": "OptionalItemIsHQ{Reward}"
       }
     },
     {
-      "index": 1487,
+      "index": 1494,
       "type": "repeat",
       "count": 5,
       "definition": {
-        "name": "Stain{Reward}[1]",
+        "name": "OptionalItemStain{Reward}",
         "converter": {
           "type": "link",
           "target": "Stain"
@@ -604,7 +639,7 @@
       }
     },
     {
-      "index": 1492,
+      "index": 1499,
       "name": "Emote{Reward}",
       "converter": {
         "type": "link",
@@ -612,7 +647,7 @@
       }
     },
     {
-      "index": 1493,
+      "index": 1500,
       "name": "Action{Reward}",
       "converter": {
         "type": "link",
@@ -620,7 +655,7 @@
       }
     },
     {
-      "index": 1494,
+      "index": 1501,
       "type": "repeat",
       "count": 2,
       "definition": {
@@ -632,15 +667,11 @@
       }
     },
     {
-      "index": 1496,
-      "name": "System{Reward}[0]",
-      "converter": {
-        "type": "link",
-        "target": "Action"
-      }
+      "index": 1503,
+      "name": "System{Reward}[0]"
     },
     {
-      "index": 1497,
+      "index": 1504,
       "name": "Other{Reward}",
       "converter": {
         "type": "link",
@@ -648,23 +679,15 @@
       }
     },
     {
-      "index": 1498,
-      "name": "System{Reward}[1]",
-      "converter": {
-        "type": "link",
-        "target": "Action"
-      }
+      "index": 1505,
+      "name": "System{Reward}[1]"
     },
     {
-      "index": 1499,
-      "name": "GCType{Reward}",
-      "converter": {
-        "type": "link",
-        "target": "Action"
-      }
+      "index": 1506,
+      "name": "GCType{Reward}"
     },
     {
-      "index": 1500,
+      "index": 1507,
       "name": "InstanceContent{Unlock}",
       "converter": {
         "type": "link",
@@ -672,7 +695,11 @@
       }
     },
     {
-      "index": 1502,
+      "index": 1508,
+      "name": "Tomestone"
+    },
+    {
+      "index": 1509,
       "name": "Tomestone{Reward}",
       "converter": {
         "type": "complexlink",
@@ -686,15 +713,15 @@
       }
     },
     {
-      "index": 1503,
+      "index": 1510,
       "name": "TomestoneCount{Reward}"
     },
     {
-      "index": 1504,
+      "index": 1511,
       "name": "ReputationReward"
     },
     {
-      "index": 1505,
+      "index": 1512,
       "name": "PlaceName",
       "converter": {
         "type": "link",
@@ -702,7 +729,7 @@
       }
     },
     {
-      "index": 1506,
+      "index": 1513,
       "name": "JournalGenre",
       "converter": {
         "type": "link",
@@ -710,29 +737,29 @@
       }
     },
     {
-      "index": 1508,
+      "index": 1515,
       "name": "Icon",
       "converter": {
         "type": "icon"
       }
     },
     {
-      "index": 1509,
+      "index": 1516,
       "name": "Icon{Special}",
       "converter": {
         "type": "icon"
       }
     },
     {
-      "index": 1510,
+      "index": 1517,
       "name": "Introduction"
     },
     {
-      "index": 1511,
+      "index": 1518,
       "name": "HideOfferIcon"
     },
     {
-      "index": 1512,
+      "index": 1519,
       "name": "EventIconType",
       "converter": {
         "type": "link",
@@ -740,7 +767,7 @@
       }
     },
     {
-      "index": 1514,
+      "index": 1521,
       "name": "SortKey"
     }
   ]

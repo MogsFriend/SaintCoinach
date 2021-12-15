@@ -10,12 +10,28 @@
       "name": "Location"
     },
     {
+      "index": 2,
+      "name": "X"
+    },
+    {
+      "index": 3,
+      "name": "Y"
+    },
+    {
+      "index": 4,
+      "name": "Z"
+    },
+    {
       "index": 5,
       "name": "Map",
       "converter": {
         "type": "link",
         "target": "SubmarineMap"
       }
+    },
+    {
+      "index": 6,
+      "name": "Passengers"
     },
     {
       "index": 7,
@@ -31,11 +47,11 @@
     },
     {
       "index": 10,
-      "name": "Duration<min>"
+      "name": "SurveyDuration<min>"
     },
     {
       "index": 11,
-      "name": "DistanceForSurvey"
+      "name": "SurveyDistance"
     },
     {
       "index": 12,

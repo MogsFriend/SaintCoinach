@@ -78,32 +78,16 @@
       "name": "Priority"
     },
     {
-      "index": 18,
-      "name": "Roulette"
-    },
-    {
-      "index": 20,
-      "name": "Battle"
-    },
-    {
-      "index": 21,
-      "name": "LookAt"
-    },
-    {
-      "index": 22,
-      "name": "Poke"
-    },
-    {
       "index": 23,
       "name": "Enemy"
     },
     {
       "index": 24,
-      "name": "Stroke"
+      "name": "Battle"
     },
     {
       "index": 25,
-      "name": "Clapping"
+      "name": "Roulette"
     },
     {
       "index": 26,
@@ -115,6 +99,10 @@
     {
       "index": 27,
       "name": "Order"
+    },
+    {
+      "index": 28,
+      "name": "IdleAnimation"
     },
     {
       "index": 30,

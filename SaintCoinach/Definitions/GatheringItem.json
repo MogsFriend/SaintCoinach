@@ -21,7 +21,15 @@
       }
     },
     {
-      "index": 4,
+      "index": 3,
+      "name": "Quest",
+      "converter": {
+        "type": "link",
+        "target": "Quest"
+      }
+    },
+    {
+      "index": 5,
       "name": "IsHidden"
     }
   ]
